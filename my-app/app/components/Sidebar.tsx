@@ -12,6 +12,7 @@ export default function Sidebar() {
     { href: '/dashboard', label: 'Dashboard', icon: '📊' },
     { href: '/contacts', label: 'Contacts', icon: '👥' },
     { href: '/pipeline', label: 'Pipeline', icon: '🔄' },
+    { href: '/opportunities', label: 'Opportunities', icon: '💼' },
     { href: '/quotes', label: 'Quotes', icon: '📄' },
     { href: '/jobs', label: 'Jobs', icon: '🔨' },
   ];

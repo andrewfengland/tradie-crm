@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 import { opportunities } from '../lib/opportunities';
@@ -45,7 +46,11 @@ export default function OpportunitiesPage() {
                     {opportunities.map((opportunity) => (
                       <tr key={opportunity.id} className="hover:bg-slate-50">
                         <td className="px-4 py-4 text-slate-900">{opportunity.title}</td>
-                        <td className="px-4 py-4 text-slate-600">{opportunity.contact}</td>
+                        <td className="px-4 py-4 text-slate-600">
+                          <Link href={`/contacts/${opportunity.contactId}`} className="text-slate-900 hover:text-blue-600">
+                            {opportunity.contact}
+                          </Link>
+                        </td>
                         <td className="px-4 py-4 text-slate-600">{opportunity.stage}</td>
                         <td className="px-4 py-4 text-slate-600">${opportunity.estimatedValue.toLocaleString()}</td>
                         <td className="px-4 py-4 text-slate-600">{opportunity.assignedStaff}</td>
@@ -63,7 +68,9 @@ export default function OpportunitiesPage() {
                   className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
                 >
                   <p className="text-sm font-semibold text-slate-900">{opportunity.title}</p>
-                  <p className="mt-1 text-sm text-slate-600">Contact: {opportunity.contact}</p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Contact: <Link href={`/contacts/${opportunity.contactId}`} className="text-slate-900 hover:text-blue-600">{opportunity.contact}</Link>
+                  </p>
                   <div className="mt-4 space-y-2 text-sm text-slate-600">
                     <p>Stage: {opportunity.stage}</p>
                     <p>Value: ${opportunity.estimatedValue.toLocaleString()}</p>
