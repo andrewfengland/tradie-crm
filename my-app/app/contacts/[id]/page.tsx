@@ -43,12 +43,20 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
                     Review contact information, notes, and related quotes or jobs.
                   </p>
                 </div>
-                <Link
-                  href="/contacts"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  Back to contacts
-                </Link>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Link
+                    href="/contacts"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Back to contacts
+                  </Link>
+                  <Link
+                    href={`/contacts/${id}/edit`}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                  >
+                    Edit contact
+                  </Link>
+                </div>
               </div>
             </section>
 

@@ -55,3 +55,10 @@ export const contacts: Contact[] = [
 export function getContactById(id: string) {
   return contacts.find((contact) => contact.id === id);
 }
+
+export function updateContact(id: string, data: Partial<Omit<Contact, 'id'>>) {
+  const index = contacts.findIndex((contact) => contact.id === id);
+  if (index !== -1) {
+    contacts[index] = { ...contacts[index], ...data };
+  }
+}
