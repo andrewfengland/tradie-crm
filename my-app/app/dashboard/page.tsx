@@ -1,7 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
+
+const quickLinks = [
+  { label: 'New Contact',     href: '/contacts/new' },
+  { label: 'New Opportunity', href: '/opportunities/new' },
+  { label: 'New Quote',       href: '/quotes/new' },
+  { label: 'New Job',         href: '/jobs/new' },
+  { label: 'View Pipeline',   href: '/pipeline' },
+];
 
 export default function DashboardPage() {
   // Sample metrics data
@@ -23,7 +32,7 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    Build Day 26
+                    Build Day 27
                   </div>
                   <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>
@@ -31,9 +40,28 @@ export default function DashboardPage() {
                     A clean snapshot of your tradie business with the most important items at a glance.
                   </p>
                 </div>
-                <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
+                <Link
+                  href="/quotes/new"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                >
                   New quote
-                </button>
+                </Link>
+              </div>
+            </section>
+
+            {/* Quick Actions */}
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Quick actions</h2>
+              <div className="flex flex-wrap gap-3">
+                {quickLinks.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    {label}
+                  </Link>
+                ))}
               </div>
             </section>
 

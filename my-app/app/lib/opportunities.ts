@@ -113,3 +113,10 @@ export const opportunities: Opportunity[] = [
 export function getOpportunityById(id: string) {
   return opportunities.find((opportunity) => opportunity.id === id);
 }
+
+export function updateOpportunityStage(id: string, newStage: string) {
+  const opp = opportunities.find((o) => o.id === id);
+  if (opp) {
+    opp.stage = newStage;
+  }
+}

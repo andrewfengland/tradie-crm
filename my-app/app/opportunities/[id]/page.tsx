@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
 import { getOpportunityById } from '../../lib/opportunities';
+import StageUpdater from './StageUpdater';
 
 export default async function OpportunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -98,6 +99,8 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
               </div>
 
               <div className="space-y-4">
+                <StageUpdater opportunityId={opportunity.id} currentStage={opportunity.stage} />
+
                 <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
                     <h2 className="text-xl font-semibold text-slate-900">Related quotes</h2>
