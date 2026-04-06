@@ -50,9 +50,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                  <Link
+                    href={`/jobs/${id}/edit`}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
                     Edit Job
-                  </button>
+                  </Link>
                   <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
                     Mark Complete
                   </button>
