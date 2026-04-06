@@ -1,10 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 import { getSupabase, type Customer } from '../lib/supabase';
+
+const EMPTY_FORM = {
+  full_name: '',
+  phone: '',
+  email: '',
+  suburb: '',
+  job_type: '',
+  status: 'new',
+  notes: '',
+};
 
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<Customer[]>([]);
@@ -12,27 +21,28 @@ export default function ContactsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    async function fetchContacts() {
-      setLoading(true);
-      setError(null);
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-      const { data, error } = await getSupabase()
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setContacts(data ?? []);
-      }
-
-      setLoading(false);
+  async function fetchContacts() {
+    setLoading(true);
+    setError(null);
+    const { data, error } = await getSupabase()
+      .from('customers')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) {
+      setError(error.message);
+    } else {
+      setContacts(data ?? []);
     }
+    setLoading(false);
+  }
 
-    fetchContacts();
-  }, []);
+  useEffect(() => { fetchContacts(); }, []);
 
   const filtered = contacts.filter((c) => {
     const q = searchQuery.toLowerCase();
@@ -43,6 +53,40 @@ export default function ContactsPage() {
       (c.suburb ?? '').toLowerCase().includes(q)
     );
   });
+
+  function openDrawer() {
+    setForm(EMPTY_FORM);
+    setSaveError(null);
+    setDrawerOpen(true);
+  }
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+  }
+
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSave() {
+    if (!form.full_name.trim()) return;
+    setSaving(true);
+    setSaveError(null);
+
+    const { error } = await getSupabase().from('customers').insert([form]);
+
+    if (error) {
+      setSaveError(error.message);
+      setSaving(false);
+    } else {
+      setDrawerOpen(false);
+      await fetchContacts();
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-100">
@@ -64,14 +108,12 @@ export default function ContactsPage() {
                     A simple list of contacts so you can quickly find the people you work with.
                   </p>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Link
-                    href="/contacts/new"
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
-                  >
-                    Add Contact
-                  </Link>
-                </div>
+                <button
+                  onClick={openDrawer}
+                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                >
+                  Add Contact
+                </button>
               </div>
             </section>
 
@@ -143,25 +185,18 @@ export default function ContactsPage() {
                     <tbody className="divide-y divide-slate-200 bg-white">
                       {filtered.map((c) => (
                         <tr key={c.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-4 font-medium text-slate-900 whitespace-nowrap">
-                            {c.full_name}
-                          </td>
+                          <td className="px-4 py-4 font-medium text-slate-900 whitespace-nowrap">{c.full_name}</td>
                           <td className="px-4 py-4 text-slate-600">{c.phone ?? '—'}</td>
                           <td className="px-4 py-4 text-slate-600">{c.email ?? '—'}</td>
                           <td className="px-4 py-4 text-slate-600">{c.suburb ?? '—'}</td>
                           <td className="px-4 py-4 text-slate-600">{c.job_type ?? '—'}</td>
                           <td className="px-4 py-4">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                c.status === 'active'
-                                  ? 'bg-green-100 text-green-700'
-                                  : c.status === 'new'
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : c.status === 'inactive'
-                                  ? 'bg-red-100 text-red-600'
-                                  : 'bg-slate-100 text-slate-600'
-                              }`}
-                            >
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              c.status === 'active' ? 'bg-green-100 text-green-700'
+                              : c.status === 'new' ? 'bg-blue-100 text-blue-700'
+                              : c.status === 'inactive' ? 'bg-red-100 text-red-600'
+                              : 'bg-slate-100 text-slate-600'
+                            }`}>
                               {c.status}
                             </span>
                           </td>
@@ -176,8 +211,151 @@ export default function ContactsPage() {
           </div>
         </main>
       </div>
+
+      {/* Drawer overlay */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-40 flex justify-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={closeDrawer}
+          />
+
+          {/* Panel */}
+          <div className="relative z-50 w-full max-w-md bg-white h-full shadow-xl flex flex-col overflow-y-auto">
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">New Contact</h2>
+              <button
+                onClick={closeDrawer}
+                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="flex-1 px-6 py-6 space-y-5">
+
+              {saveError && (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                  <p className="text-sm text-red-700">{saveError}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-900">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="full_name"
+                  type="text"
+                  value={form.full_name}
+                  onChange={handleChange}
+                  placeholder="e.g. Sarah Mitchell"
+                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-900">Phone</label>
+                  <input
+                    name="phone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="0412 345 678"
+                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-900">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="sarah@example.com"
+                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-900">Suburb</label>
+                  <input
+                    name="suburb"
+                    type="text"
+                    value={form.suburb}
+                    onChange={handleChange}
+                    placeholder="e.g. Bondi"
+                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-900">Job Type</label>
+                  <input
+                    name="job_type"
+                    type="text"
+                    value={form.job_type}
+                    onChange={handleChange}
+                    placeholder="e.g. Electrical"
+                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-900">Status</label>
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="new">New</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-900">Notes</label>
+                <textarea
+                  name="notes"
+                  rows={4}
+                  value={form.notes}
+                  onChange={handleChange}
+                  placeholder="Any additional notes…"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none resize-none"
+                />
+              </div>
+
+            </div>
+
+            {/* Drawer footer */}
+            <div className="flex gap-3 px-6 py-5 border-t border-slate-200">
+              <button
+                onClick={closeDrawer}
+                className="flex-1 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving || !form.full_name.trim()}
+                className="flex-1 inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                {saving ? 'Saving…' : 'Save Contact'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 
