@@ -47,10 +47,10 @@ export default function CustomersPage() {
 
             {/* Header */}
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Supabase</p>
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">CRM</p>
               <h1 className="mt-2 text-3xl font-semibold text-slate-900">Customers</h1>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Live data from Supabase — the single backend for this app.
+                All customers from your Supabase database.
               </p>
             </section>
 
@@ -120,8 +120,10 @@ export default function CustomersPage() {
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             c.status === 'active'
                               ? 'bg-green-100 text-green-700'
-                              : c.status === 'lead'
+                              : c.status === 'new'
                               ? 'bg-blue-100 text-blue-700'
+                              : c.status === 'inactive'
+                              ? 'bg-red-100 text-red-600'
                               : 'bg-slate-100 text-slate-600'
                           }`}
                         >

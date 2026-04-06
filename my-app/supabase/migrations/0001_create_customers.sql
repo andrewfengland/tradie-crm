@@ -1,6 +1,9 @@
 -- Create customers table
 -- Run this SQL in: Supabase Dashboard → SQL Editor → New query
 
+-- Enable pgcrypto for gen_random_uuid() (safe to run even if already enabled)
+create extension if not exists pgcrypto;
+
 create table if not exists public.customers (
   id          uuid primary key default gen_random_uuid(),
   created_at  timestamptz not null default now(),
