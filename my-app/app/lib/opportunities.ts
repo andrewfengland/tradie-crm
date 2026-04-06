@@ -6,6 +6,8 @@ export type Opportunity = {
   stage: string;
   estimatedValue: number;
   assignedStaff: string;
+  source: string;
+  notes: string;
 };
 
 export const opportunities: Opportunity[] = [
@@ -17,6 +19,8 @@ export const opportunities: Opportunity[] = [
     stage: 'Proposal',
     estimatedValue: 25000,
     assignedStaff: 'John Doe',
+    source: 'Referral',
+    notes: 'Customer wants modern appliances and island bench.',
   },
   {
     id: '2',
@@ -26,6 +30,8 @@ export const opportunities: Opportunity[] = [
     stage: 'Negotiation',
     estimatedValue: 15000,
     assignedStaff: 'Jane Smith',
+    source: 'Website',
+    notes: 'Includes new tiles and fixtures.',
   },
   {
     id: '3',
@@ -35,6 +41,8 @@ export const opportunities: Opportunity[] = [
     stage: 'Closed Won',
     estimatedValue: 8000,
     assignedStaff: 'Bob Johnson',
+    source: 'Cold Call',
+    notes: 'Custom desks and shelving.',
   },
   {
     id: '4',
@@ -44,5 +52,11 @@ export const opportunities: Opportunity[] = [
     stage: 'Lead',
     estimatedValue: 30000,
     assignedStaff: 'Alice Brown',
+    source: 'Social Media',
+    notes: 'Emergency repair needed.',
   },
 ];
+
+export function getOpportunityById(id: string) {
+  return opportunities.find((opportunity) => opportunity.id === id);
+}

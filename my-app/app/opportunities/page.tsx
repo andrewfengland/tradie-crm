@@ -135,7 +135,11 @@ export default function OpportunitiesPage() {
                     {filteredOpportunities.length > 0 ? (
                       filteredOpportunities.map((opportunity) => (
                         <tr key={opportunity.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-4 text-slate-900">{opportunity.title}</td>
+                          <td className="px-4 py-4 text-slate-900">
+                            <Link href={`/opportunities/${opportunity.id}`} className="text-slate-900 hover:text-blue-600">
+                              {opportunity.title}
+                            </Link>
+                          </td>
                           <td className="px-4 py-4 text-slate-600">
                             <Link href={`/contacts/${opportunity.contactId}`} className="text-slate-900 hover:text-blue-600">
                               {opportunity.contact}
