@@ -72,3 +72,25 @@ export const jobs: Job[] = [
 export function getJobById(id: string) {
   return jobs.find((job) => job.id === id);
 }
+
+export function createJobFromQuote(quote: Pick<import('./quotes').Quote, 'quoteNumber' | 'clientName' | 'clientId' | 'jobAddress' | 'lineItems' | 'notes'>): string {
+  const newId = String(jobs.length + 1);
+  const year = new Date().getFullYear();
+  const newJobNumber = `J-${year}-${String(jobs.length + 1).padStart(3, '0')}`;
+  const scope = quote.lineItems.map((item) => item.description).join(', ') + '.';
+  const newJob: Job = {
+    id: newId,
+    jobNumber: newJobNumber,
+    clientName: quote.clientName,
+    clientId: quote.clientId,
+    siteAddress: quote.jobAddress,
+    status: 'Scheduled',
+    assignedStaff: '',
+    scheduledDate: '',
+    scope,
+    materialsNeeded: [],
+    notes: `Converted from quote ${quote.quoteNumber}. ${quote.notes}`,
+  };
+  jobs.push(newJob);
+  return newId;
+}

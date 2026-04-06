@@ -1,11 +1,26 @@
+'use client';
+
+import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { getQuoteById } from '../../lib/quotes';
+import { getQuoteById, updateMockQuote } from '../../lib/quotes';
+import { createJobFromQuote } from '../../lib/jobs';
 
-export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+const badgeClasses: Record<string, string> = {
+  'Draft':    'bg-slate-100 text-slate-700',
+  'Sent':     'bg-blue-100 text-blue-800',
+  'Accepted': 'bg-emerald-100 text-emerald-800',
+  'Rejected': 'bg-red-100 text-red-800',
+  'Expired':  'bg-amber-100 text-amber-800',
+};
+
+export default function QuoteDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const quote = getQuoteById(id);
+  const [status, setStatus] = useState(quote?.status ?? '');
 
   if (!quote) {
     return (
@@ -31,6 +46,16 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
     );
   }
 
+  function handleMarkAccepted() {
+    updateMockQuote(id, { status: 'Accepted' });
+    setStatus('Accepted');
+  }
+
+  function handleConvertToJob() {
+    const newJobId = createJobFromQuote(quote!);
+    router.push(`/jobs/${newJobId}`);
+  }
+
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
@@ -49,17 +74,24 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                     Review quote details, line items, and totals.
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Link
                     href={`/quotes/${quote.id}/edit`}
                     className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     Edit Quote
                   </Link>
-                  <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
+                  <button
+                    onClick={handleMarkAccepted}
+                    disabled={status === 'Accepted'}
+                    className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
                     Mark Accepted
                   </button>
-                  <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
+                  <button
+                    onClick={handleConvertToJob}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                  >
                     Convert to Job
                   </button>
                 </div>
@@ -85,7 +117,9 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Status</p>
-                      <p className="mt-2 font-medium text-slate-900">{quote.status}</p>
+                      <span className={`mt-2 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${badgeClasses[status] ?? 'bg-slate-100 text-slate-700'}`}>
+                        {status}
+                      </span>
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Created Date</p>

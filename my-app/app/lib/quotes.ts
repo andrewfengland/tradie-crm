@@ -75,3 +75,10 @@ export const quotes: Quote[] = [
 export function getQuoteById(id: string) {
   return quotes.find((quote) => quote.id === id);
 }
+
+export function updateMockQuote(id: string, data: Partial<Omit<Quote, 'id'>>) {
+  const index = quotes.findIndex((q) => q.id === id);
+  if (index !== -1) {
+    quotes[index] = { ...quotes[index], ...data };
+  }
+}
