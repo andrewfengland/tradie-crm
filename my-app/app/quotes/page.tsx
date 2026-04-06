@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 
@@ -37,7 +38,7 @@ export default function QuotesPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="space-y-4">
                 {quoteRequests.map((quote) => (
-                  <div key={quote.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                  <Link key={quote.id} href={`/quotes/${quote.id}`} className="block rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5 hover:bg-slate-100 transition-colors">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-base font-semibold text-slate-900">{quote.name}</p>
@@ -45,7 +46,7 @@ export default function QuotesPage() {
                       </div>
                       <p className="text-lg font-semibold text-slate-900">{quote.amount}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>

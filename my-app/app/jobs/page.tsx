@@ -1,13 +1,14 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 
 const jobs = [
-  { id: 1, title: 'Bathroom Refurb', client: 'Olivia Hart', due: 'Apr 15', status: 'Awaiting Deposit' },
-  { id: 2, title: 'Roof Replacement', client: 'Ethan Reed', due: 'Apr 22', status: 'Ready to Schedule' },
-  { id: 3, title: 'Kitchen Fitout', client: 'Mia Carter', due: 'Apr 28', status: 'In Progress' },
-  { id: 4, title: 'Deck Installation', client: 'Noah Turner', due: 'May 3', status: 'Complete' },
+  { id: '1', title: 'Bathroom Refurb', client: 'Olivia Hart', due: 'Apr 15', status: 'Awaiting Deposit' },
+  { id: '2', title: 'Roof Replacement', client: 'Ethan Reed', due: 'Apr 22', status: 'Ready to Schedule' },
+  { id: '3', title: 'Kitchen Fitout', client: 'Mia Carter', due: 'Apr 28', status: 'In Progress' },
+  { id: '4', title: 'Deck Installation', client: 'Noah Turner', due: 'May 3', status: 'Complete' },
 ];
 
 const badgeClasses: Record<string, string> = {
@@ -45,7 +46,7 @@ export default function JobsPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="space-y-4">
                 {jobs.map((job) => (
-                  <div key={job.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                  <Link key={job.id} href={`/jobs/${job.id}`} className="block rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5 hover:bg-slate-100 transition-colors">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-base font-semibold text-slate-900">{job.title}</p>
@@ -58,7 +59,7 @@ export default function JobsPage() {
                         <span className="text-sm font-medium text-slate-700">Due {job.due}</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>
