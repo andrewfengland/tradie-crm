@@ -12,8 +12,17 @@ const quickLinks = [
   { label: 'View Pipeline',   href: '/pipeline' },
 ];
 
+const recentActivity = [
+  { id: 1, action: 'Contact added',          record: 'Olivia Hart',         time: '2 minutes ago' },
+  { id: 2, action: 'Opportunity updated',    record: 'Kitchen Renovation',  time: '18 minutes ago' },
+  { id: 3, action: 'Quote accepted',         record: 'QT-004 – Deck Build', time: '1 hour ago' },
+  { id: 4, action: 'Job marked complete',    record: 'Office Carpentry',    time: '3 hours ago' },
+  { id: 5, action: 'New opportunity created',record: 'Roof Replacement',    time: 'Yesterday' },
+  { id: 6, action: 'Quote sent',             record: 'QT-003 – Fence',      time: 'Yesterday' },
+  { id: 7, action: 'Contact updated',        record: 'Ethan Reed',          time: '2 days ago' },
+];
+
 export default function DashboardPage() {
-  // Sample metrics data
   const metrics = [
     { label: 'Leads This Week', value: '5' },
     { label: 'Quotes Sent', value: '2' },
@@ -28,11 +37,12 @@ export default function DashboardPage() {
         <TopNav />
         <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8">
           <div className="mx-auto w-full max-w-7xl space-y-6">
+            {/* Header */}
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    Build Day 27
+                    Build Day 28
                   </div>
                   <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>
@@ -65,17 +75,36 @@ export default function DashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6">Key Metrics</h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {metrics.map((metric) => (
-                  <div key={metric.label} className="rounded-3xl bg-slate-50 p-4">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{metric.label}</p>
-                    <p className="mt-2 text-2xl font-semibold text-slate-900">{metric.value}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Metrics + Recent Activity side by side on large screens */}
+            <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-slate-900 mb-6">Key Metrics</h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {metrics.map((metric) => (
+                    <div key={metric.label} className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{metric.label}</p>
+                      <p className="mt-2 text-2xl font-semibold text-slate-900">{metric.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Recent Activity */}
+              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent activity</h2>
+                <ul className="divide-y divide-slate-100">
+                  {recentActivity.map((item) => (
+                    <li key={item.id} className="flex items-start justify-between gap-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-800">{item.action}</p>
+                        <p className="mt-0.5 text-sm text-slate-500 truncate">{item.record}</p>
+                      </div>
+                      <span className="flex-shrink-0 text-xs text-slate-400 mt-0.5">{item.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
           </div>
         </main>
       </div>
