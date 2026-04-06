@@ -3,6 +3,35 @@
 import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
+import { contacts } from '../lib/contacts';
+import { opportunities } from '../lib/opportunities';
+import { quotes } from '../lib/quotes';
+import { jobs } from '../lib/jobs';
+
+const jobBadge: Record<string, string> = {
+  'In Progress': 'bg-emerald-100 text-emerald-800',
+  'Scheduled':   'bg-blue-100 text-blue-800',
+  'Completed':   'bg-slate-100 text-slate-700',
+  'On Hold':     'bg-amber-100 text-amber-800',
+  'Awaiting Approval': 'bg-purple-100 text-purple-800',
+};
+
+const quoteBadge: Record<string, string> = {
+  'Draft':    'bg-slate-100 text-slate-700',
+  'Sent':     'bg-blue-100 text-blue-800',
+  'Accepted': 'bg-emerald-100 text-emerald-800',
+  'Rejected': 'bg-red-100 text-red-800',
+  'Expired':  'bg-amber-100 text-amber-800',
+};
+
+const stageBadge: Record<string, string> = {
+  'New Lead':   'bg-slate-100 text-slate-700',
+  'Contacted':  'bg-blue-100 text-blue-800',
+  'Quoted':     'bg-purple-100 text-purple-800',
+  'Follow Up':  'bg-amber-100 text-amber-800',
+  'Won':        'bg-emerald-100 text-emerald-800',
+  'Lost':       'bg-red-100 text-red-800',
+};
 
 const quickLinks = [
   { label: 'New Contact',     href: '/contacts/new' },
@@ -23,6 +52,11 @@ const recentActivity = [
 ];
 
 export default function DashboardPage() {
+  const recentContacts     = contacts.slice(-3).reverse();
+  const recentOpportunities = opportunities.slice(-3).reverse();
+  const recentQuotes       = quotes.slice(-3).reverse();
+  const recentJobs         = jobs.slice(-3).reverse();
+
   const metrics = [
     { label: 'Leads This Week', value: '5' },
     { label: 'Quotes Sent', value: '2' },
@@ -42,7 +76,7 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    Build Day 28
+                    Build Day 29
                   </div>
                   <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>
@@ -105,6 +139,107 @@ export default function DashboardPage() {
                 </ul>
               </section>
             </div>
+
+            {/* Recent Records */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent records</h2>
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+
+                {/* Recent Contacts */}
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Contacts</h3>
+                    <Link href="/contacts" className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                      View all →
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-slate-100">
+                    {recentContacts.map((c) => (
+                      <li key={c.id} className="py-2.5">
+                        <Link href={`/contacts/${c.id}`} className="group flex flex-col gap-0.5">
+                          <span className="text-sm font-medium text-slate-800 group-hover:text-slate-900 truncate">{c.name}</span>
+                          <span className="text-xs text-slate-500 truncate">{c.company}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Recent Opportunities */}
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Opportunities</h3>
+                    <Link href="/opportunities" className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                      View all →
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-slate-100">
+                    {recentOpportunities.map((o) => (
+                      <li key={o.id} className="py-2.5">
+                        <Link href={`/opportunities/${o.id}`} className="group flex items-start justify-between gap-2">
+                          <span className="text-sm font-medium text-slate-800 group-hover:text-slate-900 truncate">{o.title}</span>
+                          <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${stageBadge[o.stage] ?? 'bg-slate-100 text-slate-700'}`}>
+                            {o.stage}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Recent Quotes */}
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Quotes</h3>
+                    <Link href="/quotes" className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                      View all →
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-slate-100">
+                    {recentQuotes.map((q) => (
+                      <li key={q.id} className="py-2.5">
+                        <Link href={`/quotes/${q.id}`} className="group flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="block text-sm font-medium text-slate-800 group-hover:text-slate-900 truncate">{q.quoteNumber}</span>
+                            <span className="block text-xs text-slate-500 truncate">{q.clientName}</span>
+                          </div>
+                          <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${quoteBadge[q.status] ?? 'bg-slate-100 text-slate-700'}`}>
+                            {q.status}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Recent Jobs */}
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Jobs</h3>
+                    <Link href="/jobs" className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                      View all →
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-slate-100">
+                    {recentJobs.map((j) => (
+                      <li key={j.id} className="py-2.5">
+                        <Link href={`/jobs/${j.id}`} className="group flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="block text-sm font-medium text-slate-800 group-hover:text-slate-900 truncate">{j.jobNumber}</span>
+                            <span className="block text-xs text-slate-500 truncate">{j.clientName}</span>
+                          </div>
+                          <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${jobBadge[j.status] ?? 'bg-slate-100 text-slate-700'}`}>
+                            {j.status}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+              </div>
+            </section>
+
           </div>
         </main>
       </div>
