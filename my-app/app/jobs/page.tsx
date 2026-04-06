@@ -37,9 +37,12 @@ export default function JobsPage() {
                     A clean view of your current jobs with status and next action details.
                   </p>
                 </div>
-                <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
+                <Link
+                  href="/jobs/new"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                >
                   New Job
-                </button>
+                </Link>
               </div>
             </section>
 
