@@ -4,6 +4,7 @@ export type Opportunity = {
   contactId: string;
   contact: string; // Contact name, linked to contacts
   stage: string;
+  expectedCloseDate: string;
   estimatedValue: number;
   assignedStaff: string;
   source: string;
@@ -17,6 +18,7 @@ export const opportunities: Opportunity[] = [
     contactId: '1',
     contact: 'Olivia Hart',
     stage: 'Proposal',
+    expectedCloseDate: '2024-05-15',
     estimatedValue: 25000,
     assignedStaff: 'John Doe',
     source: 'Referral',
@@ -28,6 +30,7 @@ export const opportunities: Opportunity[] = [
     contactId: '2',
     contact: 'Ethan Reed',
     stage: 'Negotiation',
+    expectedCloseDate: '2024-04-30',
     estimatedValue: 15000,
     assignedStaff: 'Jane Smith',
     source: 'Website',
@@ -39,6 +42,7 @@ export const opportunities: Opportunity[] = [
     contactId: '3',
     contact: 'Mia Carter',
     stage: 'Closed Won',
+    expectedCloseDate: '2024-03-10',
     estimatedValue: 8000,
     assignedStaff: 'Bob Johnson',
     source: 'Cold Call',
@@ -50,6 +54,7 @@ export const opportunities: Opportunity[] = [
     contactId: '4',
     contact: 'Noah Turner',
     stage: 'Lead',
+    expectedCloseDate: '2024-06-01',
     estimatedValue: 30000,
     assignedStaff: 'Alice Brown',
     source: 'Social Media',
