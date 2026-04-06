@@ -51,11 +51,35 @@ const recentActivity = [
   { id: 7, action: 'Contact updated',        record: 'Ethan Reed',          time: '2 days ago' },
 ];
 
+const OPEN_QUOTE_STATUSES   = new Set(['Draft', 'Sent']);
+const CLOSED_OPP_STAGES    = new Set(['Won', 'Lost']);
+
+function formatAUD(value: number) {
+  return value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+}
+
 export default function DashboardPage() {
-  const recentContacts     = contacts.slice(-3).reverse();
+  const recentContacts      = contacts.slice(-3).reverse();
   const recentOpportunities = opportunities.slice(-3).reverse();
-  const recentQuotes       = quotes.slice(-3).reverse();
-  const recentJobs         = jobs.slice(-3).reverse();
+  const recentQuotes        = quotes.slice(-3).reverse();
+  const recentJobs          = jobs.slice(-3).reverse();
+
+  const openQuoteValue = quotes
+    .filter((q) => OPEN_QUOTE_STATUSES.has(q.status))
+    .reduce((sum, q) => sum + q.total, 0);
+
+  const openOppValue = opportunities
+    .filter((o) => !CLOSED_OPP_STAGES.has(o.stage))
+    .reduce((sum, o) => sum + o.estimatedValue, 0);
+
+  const summaryTiles = [
+    { label: 'Total Contacts',      value: String(contacts.length),       href: '/contacts' },
+    { label: 'Total Opportunities', value: String(opportunities.length),  href: '/opportunities' },
+    { label: 'Total Quotes',        value: String(quotes.length),         href: '/quotes' },
+    { label: 'Total Jobs',          value: String(jobs.length),           href: '/jobs' },
+    { label: 'Open Quote Value',    value: formatAUD(openQuoteValue),     href: '/quotes' },
+    { label: 'Open Opp. Value',     value: formatAUD(openOppValue),       href: '/opportunities' },
+  ];
 
   const metrics = [
     { label: 'Leads This Week', value: '5' },
@@ -76,7 +100,7 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    Build Day 29
+                    Build Day 30
                   </div>
                   <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>
@@ -90,6 +114,23 @@ export default function DashboardPage() {
                 >
                   New quote
                 </Link>
+              </div>
+            </section>
+
+            {/* Summary Strip */}
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-900 mb-5">Business summary</h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                {summaryTiles.map((tile) => (
+                  <Link
+                    key={tile.label}
+                    href={tile.href}
+                    className="flex flex-col gap-1 rounded-3xl bg-slate-50 p-4 hover:bg-slate-100 transition-colors"
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500 leading-snug">{tile.label}</p>
+                    <p className="mt-1 text-xl font-semibold text-slate-900 truncate">{tile.value}</p>
+                  </Link>
+                ))}
               </div>
             </section>
 
