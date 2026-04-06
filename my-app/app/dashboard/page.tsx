@@ -4,6 +4,14 @@ import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 
 export default function DashboardPage() {
+  // Sample metrics data
+  const metrics = [
+    { label: 'Leads This Week', value: '5' },
+    { label: 'Quotes Sent', value: '2' },
+    { label: 'Won Jobs', value: '1' },
+    { label: 'Pipeline Value', value: '$70,000' },
+  ];
+
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
@@ -23,6 +31,18 @@ export default function DashboardPage() {
                 <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
                   New quote
                 </button>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-900 mb-6">Key Metrics</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {metrics.map((metric) => (
+                  <div key={metric.label} className="rounded-3xl bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{metric.label}</p>
+                    <p className="mt-2 text-2xl font-semibold text-slate-900">{metric.value}</p>
+                  </div>
+                ))}
               </div>
             </section>
           </div>
