@@ -10,7 +10,7 @@ export type Customer = {
   email: string | null;
   suburb: string | null;
   job_type: string | null;
-  status: 'lead' | 'active' | 'inactive' | string;
+  status: 'new' | 'active' | 'inactive' | string;
   notes: string | null;
 };
 

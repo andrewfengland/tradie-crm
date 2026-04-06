@@ -63,6 +63,13 @@ export default function Sidebar() {
           </ul>
         </nav>
 
+        {/* Build number */}
+        <div className="absolute bottom-4 left-0 w-full px-6">
+          <p className="text-xs text-gray-600 font-mono">
+            build: {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev'}
+          </p>
+        </div>
+
         {/* Overlay for mobile */}
         {isOpen && (
           <div

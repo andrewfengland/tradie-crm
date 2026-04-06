@@ -9,7 +9,7 @@ create table if not exists public.customers (
   email       text,
   suburb      text,
   job_type    text,
-  status      text not null default 'lead',
+  status      text not null default 'new',
   notes       text
 );
 
@@ -37,6 +37,6 @@ create policy "Allow delete for authenticated users"
 -- Optional: seed a few test rows for development
 insert into public.customers (full_name, phone, email, suburb, job_type, status, notes)
 values
-  ('Sarah Mitchell', '0412 345 678', 'sarah@example.com', 'Bondi', 'Electrical', 'active', 'Needs switchboard upgrade'),
-  ('James Carver',   '0421 987 654', 'james@example.com', 'Parramatta', 'Plumbing', 'lead', 'Called re hot water system'),
-  ('Priya Sharma',   '0435 111 222', 'priya@example.com', 'Chatswood', 'Roofing', 'active', 'Commercial job, needs quote');
+  ('Sarah Mitchell', '0412 345 678', 'sarah@example.com', 'Bondi', 'Electrical', 'new', 'Needs switchboard upgrade'),
+  ('James Carver',   '0421 987 654', 'james@example.com', 'Parramatta', 'Plumbing', 'new', 'Called re hot water system'),
+  ('Priya Sharma',   '0435 111 222', 'priya@example.com', 'Chatswood', 'Roofing', 'new', 'Commercial job, needs quote');
