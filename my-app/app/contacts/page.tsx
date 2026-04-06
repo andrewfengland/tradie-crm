@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 
@@ -55,7 +56,7 @@ export default function ContactsPage() {
                   <tbody className="divide-y divide-slate-200 bg-white">
                     {contacts.map((contact) => (
                       <tr key={contact.id} className="hover:bg-slate-50">
-                        <td className="px-4 py-4 text-slate-900">{contact.name}</td>
+                        <td className="px-4 py-4 text-slate-900"><Link href={`/contacts/${contact.id}`} className="text-slate-900 hover:text-blue-600">{contact.name}</Link></td>
                         <td className="px-4 py-4 text-slate-600">{contact.company}</td>
                         <td className="px-4 py-4 text-slate-600">{contact.role}</td>
                         <td className="px-4 py-4 text-slate-600">{contact.phone}</td>
@@ -69,7 +70,7 @@ export default function ContactsPage() {
 
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {contacts.map((contact) => (
-                <div key={contact.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <Link key={contact.id} href={`/contacts/${contact.id}`} className="block rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:bg-slate-50 transition-colors">
                   <p className="text-sm font-semibold text-slate-900">{contact.name}</p>
                   <p className="mt-1 text-sm text-slate-600">{contact.company}</p>
                   <div className="mt-4 space-y-2 text-sm text-slate-600">
@@ -77,7 +78,7 @@ export default function ContactsPage() {
                     <p>{contact.phone}</p>
                     <p>{contact.email}</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </section>
           </div>

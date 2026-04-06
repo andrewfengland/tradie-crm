@@ -3,8 +3,8 @@ import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
 import { getContactById } from '../../lib/contacts';
 
-export default async function ContactDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const contact = getContactById(id);
 
   if (!contact) {
