@@ -31,9 +31,9 @@ export default function ContactsPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
+                  <Link href="/contacts/new" className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
                     Add Contact
-                  </button>
+                  </Link>
                   <button className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                     Import CSV
                   </button>

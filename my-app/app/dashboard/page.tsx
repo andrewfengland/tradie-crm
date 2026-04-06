@@ -22,7 +22,10 @@ export default function DashboardPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
+                  <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+                    Build Day 23
+                  </div>
+                  <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                     A clean snapshot of your tradie business with the most important items at a glance.
