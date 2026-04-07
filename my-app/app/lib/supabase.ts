@@ -14,6 +14,17 @@ export type Customer = {
   notes: string | null;
 };
 
+export type Opportunity = {
+  id: string;
+  created_at: string;
+  title: string;
+  contact_name: string | null;
+  customer_id: string | null;
+  stage: string | null;
+  value: number | null;
+  notes: string | null;
+};
+
 // ── Client (lazy singleton) ───────────────────────────────────────────────────
 // Initialised on first call so importing this module never throws at build time.
 // Real env vars must be present when getSupabase() is first invoked (runtime).
