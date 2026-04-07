@@ -61,13 +61,15 @@ export default function EditContactPage() {
     setIsSaving(true);
     setError(null);
 
-    const { error } = await getSupabase()
-      .from('customers')
-      .update(formData)
-      .eq('id', id);
+    const res = await fetch(`/api/contacts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
 
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      setError(data.error ?? 'Failed to save changes.');
       setIsSaving(false);
     } else {
       router.push(`/contacts/${id}`);
