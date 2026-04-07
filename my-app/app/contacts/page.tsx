@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
 import { getSupabase, type Customer } from '../lib/supabase';
@@ -190,7 +191,11 @@ export default function ContactsPage() {
                     <tbody className="divide-y divide-slate-200 bg-white">
                       {filtered.map((c) => (
                         <tr key={c.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-4 font-medium text-slate-900 whitespace-nowrap">{c.full_name}</td>
+                          <td className="px-4 py-4 font-medium text-slate-900 whitespace-nowrap">
+                            <Link href={`/contacts/${c.id}`} className="hover:underline">
+                              {c.full_name}
+                            </Link>
+                          </td>
                           <td className="px-4 py-4 text-slate-600">{c.phone ?? '—'}</td>
                           <td className="px-4 py-4 text-slate-600">{c.email ?? '—'}</td>
                           <td className="px-4 py-4 text-slate-600">{c.suburb ?? '—'}</td>
