@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
+import { getSupabase } from '@/app/lib/supabase';
 
 const STAGES = ['New Lead', 'Contacted', 'Quoted', 'Follow Up', 'Won', 'Lost'];
 
@@ -32,9 +33,14 @@ export default function NewOpportunityPage() {
     setIsSaving(true);
     setError(null);
 
+    const { data: { session } } = await getSupabase().auth.getSession();
+
     const res = await fetch('/api/opportunities', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
       body: JSON.stringify(formData),
     });
     const data = await res.json();

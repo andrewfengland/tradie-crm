@@ -14,7 +14,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'title is required.' }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const authHeader = req.headers.get('authorization');
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+
+  const supabase = getSupabaseServer(token);
   const { error } = await supabase.from('opportunities').insert([{
     title,
     contact_name: (body.contact_name as string) || null,
