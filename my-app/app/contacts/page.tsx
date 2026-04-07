@@ -76,10 +76,15 @@ export default function ContactsPage() {
     setSaving(true);
     setSaveError(null);
 
-    const { error } = await getSupabase().from('customers').insert([form]);
+    const res = await fetch('/api/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+    const data = await res.json();
 
-    if (error) {
-      setSaveError(error.message);
+    if (!res.ok) {
+      setSaveError(data.error ?? 'Failed to save contact.');
       setSaving(false);
     } else {
       setDrawerOpen(false);

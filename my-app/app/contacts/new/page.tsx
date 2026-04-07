@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
-import { getSupabase } from '@/app/lib/supabase';
 
 export default function NewContactPage() {
   const router = useRouter();
@@ -33,10 +32,15 @@ export default function NewContactPage() {
     setIsSaving(true);
     setError(null);
 
-    const { error } = await getSupabase().from('customers').insert([formData]);
+    const res = await fetch('/api/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
 
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      setError(data.error ?? 'Failed to save contact.');
       setIsSaving(false);
     } else {
       router.push('/contacts');
