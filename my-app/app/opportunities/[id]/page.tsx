@@ -97,12 +97,20 @@ export default function OpportunityDetailPage() {
                   <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Opportunity detail</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">{opportunity.title}</h1>
                 </div>
-                <Link
-                  href="/opportunities"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  Back to opportunities
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={`/opportunities/${opportunity.id}/edit`}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                  >
+                    Edit Opportunity
+                  </Link>
+                  <Link
+                    href="/opportunities"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Back to opportunities
+                  </Link>
+                </div>
               </div>
             </section>
 
