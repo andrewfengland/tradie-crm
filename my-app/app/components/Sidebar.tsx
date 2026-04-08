@@ -1,12 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { getSupabase } from '@/app/lib/supabase';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await getSupabase().auth.signOut();
+    router.push('/login');
+  };
 
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -63,9 +70,16 @@ export default function Sidebar() {
           </ul>
         </nav>
 
-        {/* Build number */}
-        <div className="absolute bottom-4 left-0 w-full px-6">
-          <p className="text-xs text-gray-600 font-mono">
+        {/* Sign out */}
+        <div className="absolute bottom-4 left-0 w-full px-4">
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center text-lg">🚪</span>
+            <span>Sign out</span>
+          </button>
+          <p className="mt-2 px-4 text-xs text-gray-600 font-mono">
             build: {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev'}
           </p>
         </div>
