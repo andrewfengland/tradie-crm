@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -25,15 +26,11 @@ export type Opportunity = {
   notes: string | null;
 };
 
-// ── Client (lazy singleton) ───────────────────────────────────────────────────
-// Initialised on first call so importing this module never throws at build time.
-// Real env vars must be present when getSupabase() is first invoked (runtime).
-
-let _client: SupabaseClient | null = null;
+// ── Client (lazy singleton via createBrowserClient) ──────────────────────────
+// createBrowserClient from @supabase/ssr stores the session in cookies, which
+// allows server-side helpers to read auth state on every request.
 
 export function getSupabase(): SupabaseClient {
-  if (_client) return _client;
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -46,7 +43,6 @@ export function getSupabase(): SupabaseClient {
     );
   }
 
-  _client = createClient(url, key);
-  return _client;
+  return createBrowserClient(url, key);
 }
 

@@ -1,12 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 /**
- * Server-only Supabase client.
- * Returns a fresh client per call — safe for use inside API route handlers.
- * Pass accessToken to run requests as the authenticated user (required for RLS).
+ * Server-only Supabase client for Next.js App Router route handlers.
+ * Uses cookies() from next/headers so RLS runs as the authenticated user.
  * Never imported by client components (no 'use client' files should import this).
  */
-export function getSupabaseServer(accessToken?: string) {
+export async function getSupabaseServer() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -17,11 +17,18 @@ export function getSupabaseServer(accessToken?: string) {
     );
   }
 
-  return createClient(url, key, {
-    global: {
-      headers: accessToken
-        ? { Authorization: `Bearer ${accessToken}` }
-        : {},
+  const cookieStore = await cookies();
+
+  return createServerClient(url, key, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          cookieStore.set(name, value, options)
+        );
+      },
     },
   });
 }

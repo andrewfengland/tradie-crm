@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'full_name is required.' }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   const { error } = await supabase.from('customers').insert([{
     full_name,
     phone:    (body.phone    as string) || null,

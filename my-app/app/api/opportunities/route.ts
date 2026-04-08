@@ -14,10 +14,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'title is required.' }, { status: 400 });
   }
 
-  const authHeader = req.headers.get('authorization');
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+  const supabase = await getSupabaseServer();
 
-  const supabase = getSupabaseServer(token);
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized – please sign in.' }, { status: 401 });
+  }
+
   const { error } = await supabase.from('opportunities').insert([{
     title,
     contact_name: (body.contact_name as string) || null,

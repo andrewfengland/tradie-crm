@@ -22,7 +22,7 @@ export async function PUT(
     return NextResponse.json({ error: 'full_name is required.' }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   const { error } = await supabase
     .from('customers')
     .update({
@@ -52,7 +52,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Missing contact id.' }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   const { error } = await supabase.from('customers').delete().eq('id', id);
 
   if (error) {
