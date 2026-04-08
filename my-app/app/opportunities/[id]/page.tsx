@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Opportunity } from '@/app/lib/supabase';
@@ -18,9 +18,26 @@ const stageBadge: Record<string, string> = {
 
 export default function OpportunityDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [opportunity, setOpportunity] = useState<Opportunity | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    if (!confirm('Delete this opportunity? This cannot be undone.')) return;
+    setDeleting(true);
+    setDeleteError(null);
+    const res = await fetch(`/api/opportunities/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) {
+      setDeleteError(data.error ?? 'Failed to delete opportunity.');
+      setDeleting(false);
+    } else {
+      router.push('/opportunities');
+    }
+  }
 
   useEffect(() => {
     async function fetchOpportunity() {
@@ -104,6 +121,13 @@ export default function OpportunityDetailPage() {
                   >
                     Edit Opportunity
                   </Link>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                  >
+                    {deleting ? 'Deleting…' : 'Delete'}
+                  </button>
                   <Link
                     href="/opportunities"
                     className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
@@ -113,6 +137,12 @@ export default function OpportunityDetailPage() {
                 </div>
               </div>
             </section>
+
+            {deleteError && (
+              <section className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                <p className="text-sm text-red-700">{deleteError}</p>
+              </section>
+            )}
 
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-900">Details</h2>
