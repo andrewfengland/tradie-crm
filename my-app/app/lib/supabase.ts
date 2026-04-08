@@ -26,6 +26,19 @@ export type Opportunity = {
   notes: string | null;
 };
 
+export type Quote = {
+  id: string;
+  created_at: string;
+  contact_name: string | null;
+  opportunity_id: string | null;
+  status: string;
+  subtotal: number | null;
+  margin: number | null;
+  deposit_percent: number | null;
+  total: number | null;
+  notes: string | null;
+};
+
 // ── Client (lazy singleton via createBrowserClient) ──────────────────────────
 // createBrowserClient from @supabase/ssr stores the session in cookies, which
 // allows server-side helpers to read auth state on every request.
