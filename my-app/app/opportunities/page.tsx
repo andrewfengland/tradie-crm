@@ -88,6 +88,32 @@ export default function OpportunitiesPage() {
   const byStage = (stage: string) =>
     filtered.filter((o) => (o.stage ?? 'New Lead') === stage);
 
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 6);
+  weekStart.setHours(0, 0, 0, 0);
+
+  const metrics = [
+    {
+      label: 'Pipeline Value',
+      value: '$' + opportunities
+        .filter((o) => o.stage !== 'Won' && o.stage !== 'Lost')
+        .reduce((sum, o) => sum + (o.value ?? 0), 0)
+        .toLocaleString(),
+    },
+    {
+      label: 'Quote Sent',
+      value: String(opportunities.filter((o) => o.stage === 'Quote Sent').length),
+    },
+    {
+      label: 'Won',
+      value: String(opportunities.filter((o) => o.stage === 'Won').length),
+    },
+    {
+      label: 'New This Week',
+      value: String(opportunities.filter((o) => new Date(o.created_at) >= weekStart).length),
+    },
+  ];
+
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
@@ -137,6 +163,18 @@ export default function OpportunitiesPage() {
                 </select>
               </div>
             </section>
+
+            {/* Metrics */}
+            {!loading && !error && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {metrics.map((m) => (
+                  <div key={m.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">{m.label}</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{m.value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Loading */}
             {loading && (
