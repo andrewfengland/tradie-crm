@@ -30,6 +30,7 @@ export default function OpportunitiesPage() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchOpportunities() {
@@ -48,6 +49,29 @@ export default function OpportunitiesPage() {
     }
     fetchOpportunities();
   }, []);
+
+  async function handleStageChange(id: string, newStage: string) {
+    setSaving(id);
+    try {
+      const res = await fetch(`/api/opportunities/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stage: newStage }),
+      });
+      if (!res.ok) {
+        const { error } = await res.json();
+        setError(error ?? 'Failed to update stage.');
+      } else {
+        setOpportunities((prev) =>
+          prev.map((o) => (o.id === id ? { ...o, stage: newStage } : o))
+        );
+      }
+    } catch {
+      setError('Failed to update stage.');
+    } finally {
+      setSaving(null);
+    }
+  }
 
   const byStage = (stage: string) =>
     opportunities.filter((o) => (o.stage ?? 'New Lead') === stage);
@@ -120,21 +144,32 @@ export default function OpportunitiesPage() {
                             </div>
                           ) : (
                             cards.map((o) => (
-                              <Link
+                              <div
                                 key={o.id}
-                                href={`/opportunities/${o.id}`}
-                                className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
+                                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
                               >
-                                <p className="text-sm font-medium text-slate-900 leading-snug">{o.title}</p>
-                                {o.contact_name && (
-                                  <p className="mt-1 text-xs text-slate-500">{o.contact_name}</p>
-                                )}
-                                {o.value != null && (
-                                  <p className="mt-2 text-xs font-semibold text-slate-700">
-                                    ${o.value.toLocaleString()}
-                                  </p>
-                                )}
-                              </Link>
+                                <Link href={`/opportunities/${o.id}`} className="block">
+                                  <p className="text-sm font-medium text-slate-900 leading-snug">{o.title}</p>
+                                  {o.contact_name && (
+                                    <p className="mt-1 text-xs text-slate-500">{o.contact_name}</p>
+                                  )}
+                                  {o.value != null && (
+                                    <p className="mt-2 text-xs font-semibold text-slate-700">
+                                      ${o.value.toLocaleString()}
+                                    </p>
+                                  )}
+                                </Link>
+                                <select
+                                  value={o.stage ?? 'New Lead'}
+                                  onChange={(e) => handleStageChange(o.id, e.target.value)}
+                                  disabled={saving === o.id}
+                                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-600 focus:outline-none focus:border-blue-400 disabled:opacity-50 cursor-pointer"
+                                >
+                                  {STAGES.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                  ))}
+                                </select>
+                              </div>
                             ))
                           )}
                         </div>
