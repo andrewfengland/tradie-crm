@@ -31,6 +31,8 @@ export default function OpportunitiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [stageFilter, setStageFilter] = useState('');
 
   useEffect(() => {
     async function fetchOpportunities() {
@@ -73,8 +75,18 @@ export default function OpportunitiesPage() {
     }
   }
 
+  const filtered = opportunities.filter((o) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      !q ||
+      o.title.toLowerCase().includes(q) ||
+      (o.contact_name ?? '').toLowerCase().includes(q);
+    const matchesStage = !stageFilter || (o.stage ?? 'New Lead') === stageFilter;
+    return matchesSearch && matchesStage;
+  });
+
   const byStage = (stage: string) =>
-    opportunities.filter((o) => (o.stage ?? 'New Lead') === stage);
+    filtered.filter((o) => (o.stage ?? 'New Lead') === stage);
 
   return (
     <div className="flex min-h-screen bg-slate-100">
@@ -102,6 +114,27 @@ export default function OpportunitiesPage() {
                 >
                   New Opportunity
                 </Link>
+              </div>
+
+              {/* Filter controls */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center pt-2 border-t border-slate-100">
+                <input
+                  type="text"
+                  placeholder="Search by title or contact…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-400"
+                />
+                <select
+                  value={stageFilter}
+                  onChange={(e) => setStageFilter(e.target.value)}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700 focus:outline-none focus:border-blue-400"
+                >
+                  <option value="">All stages</option>
+                  {STAGES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
             </section>
 
