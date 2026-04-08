@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { updateOpportunityStage } from '../../lib/opportunities';
 
-const STAGES = ['New Lead', 'Contacted', 'Quoted', 'Follow Up', 'Won', 'Lost'];
+const STAGES = ['New Lead', 'Contacted', 'Site Visit', 'Quote Sent', 'Deposit Pending', 'Won', 'Lost'];
 
 export default function StageUpdater({
   opportunityId,

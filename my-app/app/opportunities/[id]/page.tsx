@@ -8,12 +8,13 @@ import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Opportunity } from '@/app/lib/supabase';
 
 const stageBadge: Record<string, string> = {
-  'New Lead':  'bg-slate-100 text-slate-700',
-  'Contacted': 'bg-blue-100 text-blue-800',
-  'Quoted':    'bg-purple-100 text-purple-800',
-  'Follow Up': 'bg-amber-100 text-amber-800',
-  'Won':       'bg-emerald-100 text-emerald-800',
-  'Lost':      'bg-red-100 text-red-800',
+  'New Lead':        'bg-slate-100 text-slate-700',
+  'Contacted':       'bg-blue-100 text-blue-800',
+  'Site Visit':      'bg-indigo-100 text-indigo-800',
+  'Quote Sent':      'bg-purple-100 text-purple-800',
+  'Deposit Pending': 'bg-amber-100 text-amber-800',
+  'Won':             'bg-emerald-100 text-emerald-800',
+  'Lost':            'bg-red-100 text-red-800',
 };
 
 export default function OpportunityDetailPage() {
@@ -111,7 +112,7 @@ export default function OpportunityDetailPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Opportunity detail</p>
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Opportunity</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">{opportunity.title}</h1>
                 </div>
                 <div className="flex flex-wrap gap-2">

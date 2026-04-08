@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
 
-const STAGES = ['New Lead', 'Contacted', 'Quoted', 'Follow Up', 'Won', 'Lost'];
+const STAGES = ['New Lead', 'Contacted', 'Site Visit', 'Quote Sent', 'Deposit Pending', 'Won', 'Lost'];
 
 export default function NewOpportunityPage() {
   const router = useRouter();

@@ -7,7 +7,7 @@ import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase } from '@/app/lib/supabase';
 
-const STAGES = ['New Lead', 'Contacted', 'Quoted', 'Follow Up', 'Won', 'Lost'];
+const STAGES = ['New Lead', 'Contacted', 'Site Visit', 'Quote Sent', 'Deposit Pending', 'Won', 'Lost'];
 
 export default function EditOpportunityPage() {
   const router = useRouter();
