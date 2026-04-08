@@ -23,9 +23,11 @@ function LoginForm() {
     const { error: otpError } = await getSupabase().auth.signInWithOtp({
       email,
       options: {
-        // After clicking the link, Supabase redirects here.
-        // The callback route exchanges the code for a real SSR session cookie.
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Use the explicit site URL env var so the redirect always goes to the
+        // correct domain (Vercel/production) rather than whatever origin the
+        // browser happens to report.  Falls back to window.location.origin for
+        // local dev where the env var is not set.
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/auth/callback`,
       },
     });
 
