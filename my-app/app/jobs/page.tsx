@@ -51,12 +51,20 @@ export default function JobsPage() {
                     A clean view of your current jobs with status and next action details.
                   </p>
                 </div>
-                <Link
-                  href="/jobs/new"
-                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
-                >
-                  New Job
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/jobs/schedule"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Schedule view
+                  </Link>
+                  <Link
+                    href="/jobs/new"
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                  >
+                    New Job
+                  </Link>
+                </div>
               </div>
             </section>
 
