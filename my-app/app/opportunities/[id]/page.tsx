@@ -25,6 +25,30 @@ export default function OpportunityDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [creatingQuote, setCreatingQuote] = useState(false);
+  const [createQuoteError, setCreateQuoteError] = useState<string | null>(null);
+
+  async function handleCreateQuote() {
+    if (!opportunity) return;
+    setCreatingQuote(true);
+    setCreateQuoteError(null);
+    const res = await fetch('/api/quotes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        opportunity_id: opportunity.id,
+        contact_name:   opportunity.contact_name ?? null,
+        status:         'Draft',
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setCreateQuoteError(data.error ?? 'Failed to create quote.');
+      setCreatingQuote(false);
+    } else {
+      router.push(`/quotes/${data.id}`);
+    }
+  }
 
   async function handleDelete() {
     if (!confirm('Delete this opportunity? This cannot be undone.')) return;
@@ -116,9 +140,16 @@ export default function OpportunityDetailPage() {
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">{opportunity.title}</h1>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={handleCreateQuote}
+                    disabled={creatingQuote}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+                  >
+                    {creatingQuote ? 'Creating…' : 'Create Quote'}
+                  </button>
                   <Link
                     href={`/opportunities/${opportunity.id}/edit`}
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     Edit Opportunity
                   </Link>
@@ -142,6 +173,11 @@ export default function OpportunityDetailPage() {
             {deleteError && (
               <section className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm">
                 <p className="text-sm text-red-700">{deleteError}</p>
+              </section>
+            )}
+            {createQuoteError && (
+              <section className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                <p className="text-sm text-red-700">{createQuoteError}</p>
               </section>
             )}
 
