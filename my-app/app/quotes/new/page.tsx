@@ -5,332 +5,224 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { quotes } from '../../lib/quotes';
 
-const statuses = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired'];
+type DraftItem = {
+  description: string;
+  quantity: number;
+  unit_price: number;
+};
+
+const STATUSES = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired'];
 
 export default function NewQuotePage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    clientName: '',
-    jobAddress: '',
-    status: 'Draft',
-    createdDate: new Date().toISOString().split('T')[0], // Today's date
-    expiryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
-    lineItems: [] as { description: string; quantity: number; unitPrice: number; total: number }[],
-    notes: '',
-  });
-  const [isSaving, setIsSaving] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [contact_name, setContactName] = useState('');
+  const [status, setStatus]           = useState('Draft');
+  const [notes, setNotes]             = useState('');
+  const [items, setItems]             = useState<DraftItem[]>([]);
+  const [newItem, setNewItem]         = useState<DraftItem>({ description: '', quantity: 1, unit_price: 0 });
+  const [isSaving, setIsSaving]       = useState(false);
+  const [error, setError]             = useState<string | null>(null);
 
-  const handleLineItemChange = (index: number, field: string, value: string | number) => {
-    const newLineItems = [...formData.lineItems];
-    newLineItems[index] = {
-      ...newLineItems[index],
-      [field]: value,
-    };
-    // Recalculate total for the line item
-    if (field === 'quantity' || field === 'unitPrice') {
-      newLineItems[index].total = newLineItems[index].quantity * newLineItems[index].unitPrice;
-    }
-    setFormData((prev) => ({
-      ...prev,
-      lineItems: newLineItems,
-    }));
-  };
+  const lineTotal = (item: DraftItem) => item.quantity * item.unit_price;
+  const subtotal  = items.reduce((sum, i) => sum + lineTotal(i), 0);
 
-  const handleAddLineItem = () => {
-    setFormData((prev) => ({
-      ...prev,
-      lineItems: [...prev.lineItems, { description: '', quantity: 1, unitPrice: 0, total: 0 }],
-    }));
-  };
+  function addItem() {
+    if (!newItem.description.trim()) return;
+    setItems((prev) => [...prev, { ...newItem }]);
+    setNewItem({ description: '', quantity: 1, unit_price: 0 });
+  }
 
-  const handleRemoveLineItem = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      lineItems: prev.lineItems.filter((_, i) => i !== index),
-    }));
-  };
+  function removeItem(index: number) {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  }
 
-  const calculateTotals = () => {
-    const subtotal = formData.lineItems.reduce((sum, item) => sum + item.total, 0);
-    const gst = Math.round(subtotal * 0.1);
-    const total = subtotal + gst;
-    return { subtotal, gst, total };
-  };
-
-  const handleSave = async () => {
+  async function handleSave() {
     setIsSaving(true);
+    setError(null);
 
-    const { subtotal, gst, total } = calculateTotals();
+    const quoteRes = await fetch('/api/quotes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_name, status, notes }),
+    });
+    const quoteData = await quoteRes.json();
+    if (!quoteRes.ok) {
+      setError(quoteData.error ?? 'Failed to create quote.');
+      setIsSaving(false);
+      return;
+    }
 
-    // Generate new ID and quote number
-    const maxId = Math.max(...quotes.map(q => parseInt(q.id)));
-    const newId = (maxId + 1).toString();
-    const maxQuoteNum = Math.max(...quotes.map(q => parseInt(q.quoteNumber.split('-')[2])));
-    const newQuoteNumber = `Q-2024-${(maxQuoteNum + 1).toString().padStart(3, '0')}`;
+    const quoteId: string = quoteData.id;
 
-    // Create new quote
-    const newQuote = {
-      id: newId,
-      quoteNumber: newQuoteNumber,
-      clientName: formData.clientName,
-      clientId: '1', // Default, since mock
-      jobAddress: formData.jobAddress,
-      status: formData.status,
-      createdDate: formData.createdDate,
-      expiryDate: formData.expiryDate,
-      lineItems: formData.lineItems,
-      subtotal,
-      gst,
-      total,
-      notes: formData.notes,
-    };
+    for (const item of items) {
+      const res = await fetch(`/api/quotes/${quoteId}/line-items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: item.description, quantity: item.quantity, unit_price: item.unit_price }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        setError(d.error ?? 'Failed to save line items.');
+        setIsSaving(false);
+        return;
+      }
+    }
 
-    // Add to mock data
-    quotes.push(newQuote);
-    console.log('New quote created (mock save):', newQuote);
-
-    // Simulate a brief save delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    setIsSaving(false);
-    router.push('/quotes');
-  };
-
-  const { subtotal, gst, total } = calculateTotals();
+    router.push(`/quotes/${quoteId}`);
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
-
       <div className="flex-1 flex flex-col md:ml-60">
         <TopNav />
-
         <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8">
           <div className="mx-auto w-full max-w-4xl space-y-6">
+
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.24em] text-slate-500">New Quote</p>
-                  <h1 className="mt-2 text-3xl font-semibold text-slate-900">Create New Quote</h1>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                    Create a new quote with line items and pricing details.
-                  </p>
+                  <h1 className="mt-2 text-3xl font-semibold text-slate-900">Create Quote</h1>
                 </div>
+                <Link
+                  href="/quotes"
+                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </Link>
+              </div>
+            </section>
+
+            {error && (
+              <section className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                <p className="text-sm text-red-700">{error}</p>
+              </section>
+            )}
+
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+              <div>
+                <label htmlFor="contact_name" className="block text-sm font-medium text-slate-900">Contact Name</label>
+                <input
+                  id="contact_name"
+                  type="text"
+                  value={contact_name}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="e.g. Sarah Mitchell"
+                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="status" className="block text-sm font-medium text-slate-900">Status</label>
+                <select
+                  id="status"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none sm:max-w-xs"
+                >
+                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="notes" className="block text-sm font-medium text-slate-900">Notes</label>
+                <textarea
+                  id="notes"
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any relevant notes…"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none resize-none"
+                />
               </div>
             </section>
 
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="space-y-6">
-                {/* Client Name */}
-                <div>
-                  <label htmlFor="clientName" className="block text-sm font-medium text-slate-900">
-                    Client Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="clientName"
-                    name="clientName"
-                    value={formData.clientName}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                    placeholder="Enter client name"
-                  />
-                </div>
+              <h2 className="text-xl font-semibold text-slate-900">Line Items</h2>
 
-                {/* Job Address */}
-                <div>
-                  <label htmlFor="jobAddress" className="block text-sm font-medium text-slate-900">
-                    Job Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="jobAddress"
-                    name="jobAddress"
-                    value={formData.jobAddress}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                    placeholder="Enter job address"
-                  />
+              {items.length > 0 && (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-100">
+                        <th className="py-2 pr-4 text-left font-medium text-slate-600">Description</th>
+                        <th className="py-2 pr-4 text-right font-medium text-slate-600">Qty</th>
+                        <th className="py-2 pr-4 text-right font-medium text-slate-600">Unit Price</th>
+                        <th className="py-2 pr-4 text-right font-medium text-slate-600">Total</th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {items.map((item, i) => (
+                        <tr key={i}>
+                          <td className="py-3 pr-4 text-slate-900">{item.description}</td>
+                          <td className="py-3 pr-4 text-right text-slate-600">{item.quantity}</td>
+                          <td className="py-3 pr-4 text-right text-slate-600">${item.unit_price.toLocaleString()}</td>
+                          <td className="py-3 pr-4 text-right font-medium text-slate-900">${lineTotal(item).toLocaleString()}</td>
+                          <td className="py-3 text-right">
+                            <button onClick={() => removeItem(i)} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t border-slate-200">
+                        <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-slate-700">Subtotal</td>
+                        <td className="py-3 pr-4 text-right font-semibold text-slate-900">${subtotal.toLocaleString()}</td>
+                        <td />
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
+              )}
 
-                {/* Status */}
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-slate-900">
-                    Status
-                  </label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
-                  >
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Created Date */}
-                <div>
-                  <label htmlFor="createdDate" className="block text-sm font-medium text-slate-900">
-                    Created Date
-                  </label>
-                  <input
-                    type="date"
-                    id="createdDate"
-                    name="createdDate"
-                    value={formData.createdDate}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-
-                {/* Expiry Date */}
-                <div>
-                  <label htmlFor="expiryDate" className="block text-sm font-medium text-slate-900">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="date"
-                    id="expiryDate"
-                    name="expiryDate"
-                    value={formData.expiryDate}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-
-                {/* Line Items */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-900 mb-3">
-                    Line Items
-                  </label>
-                  <div className="space-y-3">
-                    {formData.lineItems.map((item, index) => (
-                      <div key={index} className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto] items-end">
-                        <div>
-                          <input
-                            type="text"
-                            value={item.description}
-                            onChange={(e) => handleLineItemChange(index, 'description', e.target.value)}
-                            placeholder="Description"
-                            className="w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                          />
-                        </div>
-                        <div>
-                          <input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => handleLineItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                            placeholder="Qty"
-                            min="0"
-                            step="0.01"
-                            className="w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                          />
-                        </div>
-                        <div>
-                          <input
-                            type="number"
-                            value={item.unitPrice}
-                            onChange={(e) => handleLineItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                            placeholder="Unit Price"
-                            min="0"
-                            step="0.01"
-                            className="w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                          />
-                        </div>
-                        <div>
-                          <input
-                            type="number"
-                            value={item.total.toFixed(2)}
-                            readOnly
-                            className="w-full rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveLineItem(index)}
-                          className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddLineItem}
-                    className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                  >
-                    + Add Line Item
-                  </button>
-                </div>
-
-                {/* Totals */}
-                <div className="rounded-3xl bg-slate-50 p-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-700">Subtotal</span>
-                      <span className="font-medium text-slate-900">${subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-700">GST (10%)</span>
-                      <span className="font-medium text-slate-900">${gst.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between border-t border-slate-200 pt-2">
-                      <span className="text-lg font-semibold text-slate-900">Total</span>
-                      <span className="text-lg font-semibold text-slate-900">${total.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Notes */}
-                <div>
-                  <label htmlFor="notes" className="block text-sm font-medium text-slate-900">
-                    Notes
-                  </label>
-                  <textarea
-                    id="notes"
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                    rows={4}
-                    placeholder="Add any additional notes..."
-                    className="mt-2 w-full rounded-3xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex gap-3 pt-2 border-t border-slate-200">
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Quote'}
-                  </button>
-                  <Link
-                    href="/quotes"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                  >
-                    Cancel
-                  </Link>
-                </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_80px_110px_auto]">
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={newItem.description}
+                  onChange={(e) => setNewItem((p) => ({ ...p, description: e.target.value }))}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Qty"
+                  value={newItem.quantity}
+                  onChange={(e) => setNewItem((p) => ({ ...p, quantity: Number(e.target.value) }))}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-blue-400"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Unit price"
+                  value={newItem.unit_price}
+                  onChange={(e) => setNewItem((p) => ({ ...p, unit_price: Number(e.target.value) }))}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-blue-400"
+                />
+                <button
+                  onClick={addItem}
+                  disabled={!newItem.description.trim()}
+                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-40"
+                >
+                  Add
+                </button>
               </div>
             </section>
+
+            <div className="flex justify-end">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                {isSaving ? 'Saving…' : 'Save Quote'}
+              </button>
+            </div>
+
           </div>
         </main>
       </div>
