@@ -7,6 +7,10 @@ export type Job = {
   status: string;
   assignedStaff: string;
   scheduledDate: string;
+  startDate?: string;
+  endDate?: string;
+  timeWindow?: string;
+  assignedCrew?: string;
   scope: string;
   materialsNeeded: string[];
   notes: string;
@@ -22,6 +26,10 @@ export const jobs: Job[] = [
     status: 'In Progress',
     assignedStaff: 'John Doe',
     scheduledDate: '2024-04-10',
+    startDate: '2024-04-10',
+    endDate: '2024-04-12',
+    timeWindow: 'Morning (7am–12pm)',
+    assignedCrew: 'John Doe, Mike Chen',
     scope: 'Kitchen renovation including cabinet installation, countertop replacement, and appliance hookup.',
     materialsNeeded: [
       'Kitchen cabinets (30 linear feet)',
@@ -40,6 +48,10 @@ export const jobs: Job[] = [
     status: 'Scheduled',
     assignedStaff: 'Jane Smith',
     scheduledDate: '2024-04-08',
+    startDate: '2024-04-08',
+    endDate: '2024-04-09',
+    timeWindow: 'Full Day',
+    assignedCrew: 'Jane Smith',
     scope: 'Full bathroom renovation including new tiles, fixtures, and ventilation system.',
     materialsNeeded: [
       'Bathroom tiles (200 sq ft)',
@@ -58,6 +70,10 @@ export const jobs: Job[] = [
     status: 'Completed',
     assignedStaff: 'Bob Johnson',
     scheduledDate: '2024-03-15',
+    startDate: '2024-03-15',
+    endDate: '2024-03-15',
+    timeWindow: 'Afternoon (12pm–5pm)',
+    assignedCrew: 'Bob Johnson',
     scope: 'Custom office shelving and desk installation.',
     materialsNeeded: [
       'Custom shelving units (5 units)',
@@ -87,6 +103,10 @@ export function createJobFromQuote(quote: Pick<import('./quotes').Quote, 'quoteN
     status: 'Scheduled',
     assignedStaff: '',
     scheduledDate: '',
+    startDate: '',
+    endDate: '',
+    timeWindow: '',
+    assignedCrew: '',
     scope,
     materialsNeeded: [],
     notes: `Converted from quote ${quote.quoteNumber}. ${quote.notes}`,

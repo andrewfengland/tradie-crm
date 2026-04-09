@@ -18,6 +18,10 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
     status: '',
     assignedStaff: '',
     scheduledDate: '',
+    startDate: '',
+    endDate: '',
+    timeWindow: '',
+    assignedCrew: '',
     scope: '',
     materialsNeeded: [] as string[],
     notes: '',
@@ -43,6 +47,10 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
         status: job.status,
         assignedStaff: job.assignedStaff,
         scheduledDate: job.scheduledDate,
+        startDate: job.startDate ?? '',
+        endDate: job.endDate ?? '',
+        timeWindow: job.timeWindow ?? '',
+        assignedCrew: job.assignedCrew ?? '',
         scope: job.scope,
         materialsNeeded: [...job.materialsNeeded],
         notes: job.notes,
@@ -94,6 +102,10 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
         status: formData.status,
         assignedStaff: formData.assignedStaff,
         scheduledDate: formData.scheduledDate,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        timeWindow: formData.timeWindow,
+        assignedCrew: formData.assignedCrew,
         scope: formData.scope,
         materialsNeeded: formData.materialsNeeded,
         notes: formData.notes,
@@ -241,6 +253,71 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
                     onChange={handleChange}
                     className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
                   />
+                </div>
+
+                {/* Scheduling */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="startDate" className="block text-sm font-medium text-slate-900">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="endDate" className="block text-sm font-medium text-slate-900">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      id="endDate"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="timeWindow" className="block text-sm font-medium text-slate-900">
+                      Time Window
+                    </label>
+                    <select
+                      id="timeWindow"
+                      name="timeWindow"
+                      value={formData.timeWindow}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select time window</option>
+                      <option value="Morning (7am–12pm)">Morning (7am–12pm)</option>
+                      <option value="Afternoon (12pm–5pm)">Afternoon (12pm–5pm)</option>
+                      <option value="Full Day">Full Day</option>
+                      <option value="TBC">TBC</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="assignedCrew" className="block text-sm font-medium text-slate-900">
+                      Assigned Crew
+                    </label>
+                    <input
+                      type="text"
+                      id="assignedCrew"
+                      name="assignedCrew"
+                      value={formData.assignedCrew}
+                      onChange={handleChange}
+                      placeholder="e.g. John Doe, Mike Chen"
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Scope */}

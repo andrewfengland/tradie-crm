@@ -129,12 +129,24 @@ export default function JobsPage() {
                         <p className="text-base font-semibold text-slate-900">{job.jobNumber}</p>
                         <p className="text-sm text-slate-500">{job.clientName}</p>
                         <p className="text-sm text-slate-500">{job.siteAddress}</p>
+                        {(job.assignedCrew || job.assignedStaff) && (
+                          <p className="text-sm text-slate-400">Crew: {job.assignedCrew || job.assignedStaff}</p>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeClasses[job.status]}`}>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeClasses[job.status] ?? 'bg-slate-100 text-slate-700'}`}>
                           {job.status}
                         </span>
-                        <span className="text-sm font-medium text-slate-700">Due {new Date(job.scheduledDate).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })}</span>
+                        {(job.startDate || job.scheduledDate) && (
+                          <span className="text-sm font-medium text-slate-700">
+                            {job.startDate
+                              ? `Starts ${new Date(job.startDate).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })}`
+                              : `Due ${new Date(job.scheduledDate).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })}`}
+                          </span>
+                        )}
+                        {job.timeWindow && (
+                          <span className="text-xs text-slate-400">{job.timeWindow}</span>
+                        )}
                       </div>
                     </div>
                   </Link>

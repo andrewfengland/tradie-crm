@@ -18,6 +18,10 @@ export default function NewJobPage() {
     status: 'Scheduled',
     assignedStaff: staffMembers[0],
     scheduledDate: '',
+    startDate: '',
+    endDate: '',
+    timeWindow: '',
+    assignedCrew: '',
     scope: '',
     materialsNeeded: [''],
     notes: '',
@@ -67,6 +71,10 @@ export default function NewJobPage() {
       status: formData.status,
       assignedStaff: formData.assignedStaff,
       scheduledDate: formData.scheduledDate,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      timeWindow: formData.timeWindow,
+      assignedCrew: formData.assignedCrew,
       scope: formData.scope,
       materialsNeeded: formData.materialsNeeded.filter((item) => item.trim() !== ''),
       notes: formData.notes,
@@ -185,6 +193,71 @@ export default function NewJobPage() {
                     onChange={handleChange}
                     className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
                   />
+                </div>
+
+                {/* Scheduling */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="startDate" className="block text-sm font-medium text-slate-900">
+                      Start Date
+                    </label>
+                    <input
+                      id="startDate"
+                      name="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="endDate" className="block text-sm font-medium text-slate-900">
+                      End Date
+                    </label>
+                    <input
+                      id="endDate"
+                      name="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="timeWindow" className="block text-sm font-medium text-slate-900">
+                      Time Window
+                    </label>
+                    <select
+                      id="timeWindow"
+                      name="timeWindow"
+                      value={formData.timeWindow}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select time window</option>
+                      <option value="Morning (7am–12pm)">Morning (7am–12pm)</option>
+                      <option value="Afternoon (12pm–5pm)">Afternoon (12pm–5pm)</option>
+                      <option value="Full Day">Full Day</option>
+                      <option value="TBC">TBC</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="assignedCrew" className="block text-sm font-medium text-slate-900">
+                      Assigned Crew
+                    </label>
+                    <input
+                      id="assignedCrew"
+                      name="assignedCrew"
+                      type="text"
+                      value={formData.assignedCrew}
+                      onChange={handleChange}
+                      placeholder="e.g. John Doe, Mike Chen"
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 <div>

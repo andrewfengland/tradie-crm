@@ -95,6 +95,22 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Scheduled Date</p>
                       <p className="mt-2 font-medium text-slate-900">{job.scheduledDate}</p>
                     </div>
+                    <div className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Start Date</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.startDate || '—'}</p>
+                    </div>
+                    <div className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">End Date</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.endDate || '—'}</p>
+                    </div>
+                    <div className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Time Window</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.timeWindow || '—'}</p>
+                    </div>
+                    <div className="rounded-3xl bg-slate-50 p-4 sm:col-span-2">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Assigned Crew</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.assignedCrew || '—'}</p>
+                    </div>
                   </div>
                 </section>
 
@@ -135,8 +151,20 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       <p className="mt-2 text-lg font-semibold text-slate-900">{job.status}</p>
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
-                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Scheduled For</p>
-                      <p className="mt-2 font-medium text-slate-900">{job.scheduledDate}</p>
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Start → End</p>
+                      <p className="mt-2 font-medium text-slate-900">
+                        {job.startDate && job.endDate
+                          ? `${job.startDate} → ${job.endDate}`
+                          : job.scheduledDate || '—'}
+                      </p>
+                    </div>
+                    <div className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Time Window</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.timeWindow || '—'}</p>
+                    </div>
+                    <div className="rounded-3xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Crew</p>
+                      <p className="mt-2 font-medium text-slate-900">{job.assignedCrew || job.assignedStaff || '—'}</p>
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Materials Count</p>
