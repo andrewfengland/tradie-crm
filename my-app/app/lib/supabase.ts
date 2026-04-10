@@ -24,6 +24,8 @@ export type Opportunity = {
   stage: string | null;
   value: number | null;
   notes: string | null;
+  follow_up_date: string | null;
+  follow_up_note: string | null;
 };
 
 export type Quote = {
@@ -37,6 +39,8 @@ export type Quote = {
   deposit_percent: number | null;
   total: number | null;
   notes: string | null;
+  follow_up_date: string | null;
+  follow_up_note: string | null;
 };
 
 export type QuoteLineItem = {

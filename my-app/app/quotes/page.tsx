@@ -148,6 +148,9 @@ export default function QuotesPage() {
                           <p className="mt-0.5 text-xs text-slate-400">
                             {new Date(q.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </p>
+                          {q.follow_up_date && (
+                            <p className="mt-0.5 text-xs text-amber-600">📅 Follow-up {q.follow_up_date}</p>
+                          )}
                         </div>
                         <div className="flex items-center gap-3">
                           {q.total != null && (

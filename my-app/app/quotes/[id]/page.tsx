@@ -32,6 +32,12 @@ export default function QuoteDetailPage() {
   const [adding,    setAdding]    = useState(false);
   const [newItem,   setNewItem]   = useState<NewItem>({ description: '', quantity: 1, unit_price: 0 });
 
+  const [editingFollowUp,  setEditingFollowUp]  = useState(false);
+  const [followUpDate,     setFollowUpDate]     = useState('');
+  const [followUpNote,     setFollowUpNote]     = useState('');
+  const [savingFollowUp,   setSavingFollowUp]   = useState(false);
+  const [followUpErr,      setFollowUpErr]      = useState<string | null>(null);
+
   const subtotal = items.reduce((sum, i) => sum + (i.line_total ?? 0), 0);
 
   async function load() {
@@ -50,6 +56,13 @@ export default function QuoteDetailPage() {
   }
 
   useEffect(() => { load(); }, [id]);
+
+  useEffect(() => {
+    if (quote) {
+      setFollowUpDate(quote.follow_up_date ?? '');
+      setFollowUpNote(quote.follow_up_note ?? '');
+    }
+  }, [quote?.id]);
 
   async function handleDelete() {
     if (!confirm('Delete this quote? This cannot be undone.')) return;
@@ -88,6 +101,25 @@ export default function QuoteDetailPage() {
   async function handleRemoveItem(itemId: string) {
     const res = await fetch(`/api/quotes/${id}/line-items/${itemId}`, { method: 'DELETE' });
     if (res.ok) await load();
+  }
+
+  async function handleSaveFollowUp() {
+    setSavingFollowUp(true);
+    setFollowUpErr(null);
+    const res = await fetch(`/api/quotes/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ follow_up_date: followUpDate || null, follow_up_note: followUpNote || null }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setFollowUpErr(data.error ?? 'Failed to save follow-up.');
+      setSavingFollowUp(false);
+      return;
+    }
+    setSavingFollowUp(false);
+    setEditingFollowUp(false);
+    await load();
   }
 
   if (loading) {
@@ -186,6 +218,76 @@ export default function QuoteDetailPage() {
                   </div>
                 )}
               </div>
+            </section>
+
+            {/* Follow-up reminder */}
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-slate-900">Follow-up Reminder</h2>
+                {!editingFollowUp && (
+                  <button
+                    onClick={() => setEditingFollowUp(true)}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    {quote.follow_up_date || quote.follow_up_note ? 'Edit' : '+ Add'}
+                  </button>
+                )}
+              </div>
+
+              {editingFollowUp ? (
+                <div className="mt-4 space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Follow-up Date</label>
+                      <input
+                        type="date"
+                        value={followUpDate}
+                        onChange={(e) => setFollowUpDate(e.target.value)}
+                        className="w-full rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Follow-up Note</label>
+                      <input
+                        type="text"
+                        value={followUpNote}
+                        onChange={(e) => setFollowUpNote(e.target.value)}
+                        placeholder="e.g. Call to confirm acceptance"
+                        className="w-full rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                  </div>
+                  {followUpErr && <p className="text-sm text-red-600">{followUpErr}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveFollowUp}
+                      disabled={savingFollowUp}
+                      className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors disabled:opacity-50"
+                    >
+                      {savingFollowUp ? 'Saving…' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => { setEditingFollowUp(false); setFollowUpDate(quote.follow_up_date ?? ''); setFollowUpNote(quote.follow_up_note ?? ''); }}
+                      className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : quote.follow_up_date || quote.follow_up_note ? (
+                <div className="mt-4 rounded-3xl bg-amber-50 border border-amber-200 p-4">
+                  {quote.follow_up_date && (
+                    <p className="font-medium text-slate-900">
+                      📅 {new Date(quote.follow_up_date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  )}
+                  {quote.follow_up_note && (
+                    <p className="mt-1 text-sm text-slate-700">{quote.follow_up_note}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-slate-400">No follow-up reminder set.</p>
+              )}
             </section>
 
             {/* Line items */}

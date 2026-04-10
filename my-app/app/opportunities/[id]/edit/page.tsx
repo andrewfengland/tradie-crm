@@ -18,6 +18,8 @@ export default function EditOpportunityPage() {
     stage: 'New Lead',
     value: '',
     notes: '',
+    follow_up_date: '',
+    follow_up_note: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,11 +38,13 @@ export default function EditOpportunityPage() {
         setNotFound(true);
       } else {
         setFormData({
-          title:        data.title ?? '',
-          contact_name: data.contact_name ?? '',
-          stage:        data.stage ?? 'New Lead',
-          value:        data.value != null ? String(data.value) : '',
-          notes:        data.notes ?? '',
+          title:          data.title ?? '',
+          contact_name:   data.contact_name ?? '',
+          stage:          data.stage ?? 'New Lead',
+          value:          data.value != null ? String(data.value) : '',
+          notes:          data.notes ?? '',
+          follow_up_date: data.follow_up_date ?? '',
+          follow_up_note: data.follow_up_note ?? '',
         });
       }
       setIsLoading(false);
@@ -210,6 +214,36 @@ export default function EditOpportunityPage() {
                     onChange={handleChange}
                     className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none resize-none"
                   />
+                </div>
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="follow_up_date" className="block text-sm font-medium text-slate-900">
+                      Follow-up Date
+                    </label>
+                    <input
+                      id="follow_up_date"
+                      name="follow_up_date"
+                      type="date"
+                      value={formData.follow_up_date}
+                      onChange={handleChange}
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="follow_up_note" className="block text-sm font-medium text-slate-900">
+                      Follow-up Note
+                    </label>
+                    <input
+                      id="follow_up_note"
+                      name="follow_up_note"
+                      type="text"
+                      value={formData.follow_up_note}
+                      onChange={handleChange}
+                      placeholder="e.g. Call to confirm deposit"
+                      className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
               </div>

@@ -220,6 +220,19 @@ export default function OpportunityDetailPage() {
                   <p className="mt-2 text-sm leading-6 text-slate-700">{opportunity.notes}</p>
                 </div>
               )}
+              {(opportunity.follow_up_date || opportunity.follow_up_note) && (
+                <div className="mt-4 rounded-3xl bg-amber-50 border border-amber-200 p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-amber-600">Follow-up Reminder</p>
+                  {opportunity.follow_up_date && (
+                    <p className="mt-2 font-medium text-slate-900">
+                      📅 {new Date(opportunity.follow_up_date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  )}
+                  {opportunity.follow_up_note && (
+                    <p className="mt-1 text-sm text-slate-700">{opportunity.follow_up_note}</p>
+                  )}
+                </div>
+              )}
             </section>
 
             <TasksSection relatedType="opportunity" relatedId={id} />

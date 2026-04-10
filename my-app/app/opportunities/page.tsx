@@ -229,6 +229,9 @@ export default function OpportunitiesPage() {
                                       ${o.value.toLocaleString()}
                                     </p>
                                   )}
+                                  {o.follow_up_date && (
+                                    <p className="mt-1 text-xs text-amber-600">📅 {o.follow_up_date}</p>
+                                  )}
                                 </Link>
                                 <select
                                   value={o.stage ?? 'New Lead'}

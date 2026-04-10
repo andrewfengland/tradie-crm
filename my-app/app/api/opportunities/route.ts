@@ -23,10 +23,12 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabase.from('opportunities').insert([{
     title,
-    contact_name: (body.contact_name as string) || null,
-    stage:        (body.stage        as string) || null,
-    value:        body.value != null && body.value !== '' ? Number(body.value) : null,
-    notes:        (body.notes        as string) || null,
+    contact_name:  (body.contact_name  as string) || null,
+    stage:         (body.stage         as string) || null,
+    value:         body.value != null && body.value !== '' ? Number(body.value) : null,
+    notes:         (body.notes         as string) || null,
+    follow_up_date: (body.follow_up_date as string) || null,
+    follow_up_note: (body.follow_up_note as string) || null,
   }]);
 
   if (error) {
