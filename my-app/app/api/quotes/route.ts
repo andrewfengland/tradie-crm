@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       opportunity_id: (body.opportunity_id as string) || null,
       status:         (body.status as string) || 'Draft',
       notes:          (body.notes as string) || null,
+      job_address:    (body.job_address as string) || null,
       subtotal:       0,
       total:          0,
     }])

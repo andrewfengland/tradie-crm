@@ -18,6 +18,7 @@ export default function NewQuotePage() {
   const router = useRouter();
 
   const [contact_name, setContactName] = useState('');
+  const [job_address,  setJobAddress]  = useState('');
   const [status, setStatus]           = useState('Draft');
   const [notes, setNotes]             = useState('');
   const [items, setItems]             = useState<DraftItem[]>([]);
@@ -45,7 +46,7 @@ export default function NewQuotePage() {
     const quoteRes = await fetch('/api/quotes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_name, status, notes }),
+      body: JSON.stringify({ contact_name, status, notes, job_address: job_address || null }),
     });
     const quoteData = await quoteRes.json();
     if (!quoteRes.ok) {
@@ -111,6 +112,18 @@ export default function NewQuotePage() {
                   value={contact_name}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="e.g. Sarah Mitchell"
+                  className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="job_address" className="block text-sm font-medium text-slate-900">Job / Site Address</label>
+                <input
+                  id="job_address"
+                  type="text"
+                  value={job_address}
+                  onChange={(e) => setJobAddress(e.target.value)}
+                  placeholder="e.g. 14 Baker Street, Melbourne VIC 3000"
                   className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>

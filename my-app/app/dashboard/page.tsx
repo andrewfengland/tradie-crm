@@ -116,7 +116,7 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    Step 57
+                    Step 58
                   </div>
                   <p className="mt-3 text-sm uppercase tracking-[0.24em] text-slate-500">Dashboard</p>
                   <h1 className="mt-2 text-3xl font-semibold text-slate-900">Overview</h1>

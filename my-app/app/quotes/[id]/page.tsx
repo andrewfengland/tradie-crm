@@ -8,6 +8,7 @@ import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Quote, type QuoteLineItem } from '@/app/lib/supabase';
 import TasksSection from '@/app/components/TasksSection';
 import NotesSection from '@/app/components/NotesSection';
+import { createJobFromSupabaseQuote } from '@/app/lib/jobs';
 
 const badgeClasses: Record<string, string> = {
   'Draft':    'bg-slate-100 text-slate-700',
@@ -38,6 +39,9 @@ export default function QuoteDetailPage() {
   const [followUpNote,     setFollowUpNote]     = useState('');
   const [savingFollowUp,   setSavingFollowUp]   = useState(false);
   const [followUpErr,      setFollowUpErr]      = useState<string | null>(null);
+
+  const [converting,   setConverting]   = useState(false);
+  const [convertErr,   setConvertErr]   = useState<string | null>(null);
 
   const subtotal = items.reduce((sum, i) => sum + (i.line_total ?? 0), 0);
 
@@ -123,6 +127,19 @@ export default function QuoteDetailPage() {
     await load();
   }
 
+  function handleConvertToJob() {
+    if (!quote) return;
+    setConverting(true);
+    setConvertErr(null);
+    try {
+      const newJobId = createJobFromSupabaseQuote(quote, items);
+      router.push(`/jobs/${newJobId}`);
+    } catch {
+      setConvertErr('Failed to convert quote to job.');
+      setConverting(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen bg-slate-100">
@@ -179,6 +196,13 @@ export default function QuoteDetailPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
+                    onClick={handleConvertToJob}
+                    disabled={converting}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+                  >
+                    {converting ? 'Converting…' : 'Convert to Job'}
+                  </button>
+                  <button
                     onClick={handleDelete}
                     disabled={deleting}
                     className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
@@ -198,6 +222,12 @@ export default function QuoteDetailPage() {
               </section>
             )}
 
+            {convertErr && (
+              <section className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                <p className="text-sm text-red-700">{convertErr}</p>
+              </section>
+            )}
+
             {/* Details */}
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-900">Details</h2>
@@ -212,6 +242,12 @@ export default function QuoteDetailPage() {
                   <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Created</p>
                   <p className="mt-2 font-medium text-slate-900">{createdDate}</p>
                 </div>
+                {quote.job_address && (
+                  <div className="rounded-3xl bg-slate-50 p-4 sm:col-span-2">
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Job / Site Address</p>
+                    <p className="mt-2 font-medium text-slate-900">{quote.job_address}</p>
+                  </div>
+                )}
                 {quote.notes && (
                   <div className="rounded-3xl bg-slate-50 p-4 sm:col-span-2">
                     <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Notes</p>

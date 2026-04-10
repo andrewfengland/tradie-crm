@@ -14,6 +14,7 @@ export type Job = {
   scope: string;
   materialsNeeded: string[];
   notes: string;
+  quoteId?: string;
 };
 
 export const JOB_STAGES = [
@@ -189,6 +190,46 @@ export function createJobFromQuote(quote: Pick<import('./quotes').Quote, 'quoteN
     scope,
     materialsNeeded: [],
     notes: `Converted from quote ${quote.quoteNumber}. ${quote.notes}`,
+  };
+  jobs.push(newJob);
+  return newId;
+}
+
+/** Create a job from a live Supabase quote + its line items. */
+export function createJobFromSupabaseQuote(
+  quote: { id: string; created_at: string; contact_name: string | null; job_address: string | null; notes: string | null },
+  lineItems: { description: string }[]
+): string {
+  const newId = String(jobs.length + 1);
+  const year = new Date().getFullYear();
+  const newJobNumber = `J-${year}-${String(jobs.length + 1).padStart(3, '0')}`;
+
+  const scopeParts = lineItems.map((i) => i.description).filter(Boolean);
+  const scope = scopeParts.length > 0 ? scopeParts.join(', ') + '.' : '';
+
+  const quoteRef = new Date(quote.created_at).toLocaleDateString('en-AU', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
+  const noteParts = [`Converted from quote created ${quoteRef}.`];
+  if (quote.notes?.trim()) noteParts.push(quote.notes.trim());
+
+  const newJob: Job = {
+    id: newId,
+    jobNumber: newJobNumber,
+    clientName: quote.contact_name ?? '',
+    clientId: '',
+    siteAddress: quote.job_address ?? '',
+    status: 'Scheduled',
+    assignedStaff: '',
+    scheduledDate: '',
+    startDate: '',
+    endDate: '',
+    timeWindow: '',
+    assignedCrew: '',
+    scope,
+    materialsNeeded: [],
+    notes: noteParts.join(' '),
+    quoteId: quote.id,
   };
   jobs.push(newJob);
   return newId;

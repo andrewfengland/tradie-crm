@@ -27,6 +27,7 @@ export async function PATCH(
   if (body.total         !== undefined) update.total         = body.total;
   if (body.follow_up_date !== undefined) update.follow_up_date = body.follow_up_date || null;
   if (body.follow_up_note !== undefined) update.follow_up_note = body.follow_up_note || null;
+  if (body.job_address   !== undefined) update.job_address    = body.job_address || null;
 
   const { error } = await supabase.from('quotes').update(update).eq('id', id);
   if (error) {

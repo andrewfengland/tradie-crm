@@ -39,6 +39,7 @@ export type Quote = {
   deposit_percent: number | null;
   total: number | null;
   notes: string | null;
+  job_address: string | null;
   follow_up_date: string | null;
   follow_up_note: string | null;
 };
