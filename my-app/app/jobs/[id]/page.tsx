@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { getJobById, JOB_STAGE_BADGE } from '../../lib/jobs';
+import { dbJobToJob, JOB_STAGE_BADGE } from '../../lib/jobs';
+import { getSupabaseServer } from '../../lib/supabase-server';
 import TasksSection from '../../../app/components/TasksSection';
 import NotesSection from '../../../app/components/NotesSection';
 import JobStageUpdater from './StageUpdater';
@@ -9,7 +10,10 @@ import MaterialsSection from '../../../app/components/MaterialsSection';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const job = getJobById(id);
+
+  const supabase = await getSupabaseServer();
+  const { data } = await supabase.from('jobs').select('*').eq('id', id).single();
+  const job = data ? dbJobToJob(data) : null;
 
   if (!job) {
     return (

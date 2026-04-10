@@ -8,7 +8,6 @@ import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Quote, type QuoteLineItem } from '@/app/lib/supabase';
 import TasksSection from '@/app/components/TasksSection';
 import NotesSection from '@/app/components/NotesSection';
-import { createJobFromSupabaseQuote } from '@/app/lib/jobs';
 
 const badgeClasses: Record<string, string> = {
   'Draft':    'bg-slate-100 text-slate-700',
@@ -127,17 +126,37 @@ export default function QuoteDetailPage() {
     await load();
   }
 
-  function handleConvertToJob() {
+  async function handleConvertToJob() {
     if (!quote) return;
     setConverting(true);
     setConvertErr(null);
-    try {
-      const newJobId = createJobFromSupabaseQuote(quote, items);
-      router.push(`/jobs/${newJobId}`);
-    } catch {
-      setConvertErr('Failed to convert quote to job.');
+
+    const quoteRef = new Date(quote.created_at).toLocaleDateString('en-AU', {
+      day: 'numeric', month: 'short', year: 'numeric',
+    });
+    const scopeParts = items.map((i) => i.description).filter(Boolean);
+    const scope = scopeParts.length > 0 ? scopeParts.join(', ') + '.' : '';
+
+    const res = await fetch('/api/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName:  quote.contact_name ?? '',
+        siteAddress: quote.job_address ?? '',
+        scope,
+        notes:       `Converted from quote created ${quoteRef}.`,
+        status:      'Scheduled',
+        quoteId:     quote.id,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      setConvertErr(data.error ?? 'Failed to create job.');
       setConverting(false);
+      return;
     }
+    router.push(`/jobs/${data.job.id}`);
   }
 
   if (loading) {

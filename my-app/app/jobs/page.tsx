@@ -1,23 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
-import { jobs, JOB_STAGES, JOB_STAGE_BADGE } from '../lib/jobs';
+import { type Job, JOB_STAGES, JOB_STAGE_BADGE } from '../lib/jobs';
 
 export default function JobsPage() {
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+
+  useEffect(() => {
+    fetch('/api/jobs')
+      .then((r) => r.json())
+      .then((d) => { if (d.jobs) setAllJobs(d.jobs); })
+      .catch(() => {});
+  }, []);
 
   // Extract unique statuses (canonical set first, then any legacy values)
   const statuses = [
     ...JOB_STAGES,
-    ...Array.from(new Set(jobs.map(j => j.status))).filter(s => !(JOB_STAGES as readonly string[]).includes(s)),
+    ...Array.from(new Set(allJobs.map(j => j.status))).filter(s => !(JOB_STAGES as readonly string[]).includes(s)),
   ];
 
   // Filter jobs based on search and filters
-  const filteredJobs = jobs.filter(job => {
+  const filteredJobs = allJobs.filter(job => {
     const matchesSearch =
       job.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.siteAddress.toLowerCase().includes(searchQuery.toLowerCase());
@@ -119,11 +127,11 @@ export default function JobsPage() {
                 <div className="pt-2 border-t border-slate-200 space-y-3">
                   <p className="text-sm text-slate-600">
                     Showing <span className="font-semibold text-slate-900">{filteredJobs.length}</span> of{' '}
-                    <span className="font-semibold text-slate-900">{jobs.length}</span> jobs
+                    <span className="font-semibold text-slate-900">{allJobs.length}</span> jobs
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {JOB_STAGES.map((stage) => {
-                      const count = jobs.filter(j => j.status === stage).length;
+                      const count = allJobs.filter(j => j.status === stage).length;
                       if (count === 0) return null;
                       return (
                         <button

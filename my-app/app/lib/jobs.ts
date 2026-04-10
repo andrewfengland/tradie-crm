@@ -1,3 +1,5 @@
+import type { DbJob } from './supabase';
+
 export type Job = {
   id: string;
   jobNumber: string;
@@ -16,6 +18,28 @@ export type Job = {
   notes: string;
   quoteId?: string;
 };
+
+/** Convert a raw Supabase jobs row into the camelCase Job shape used by pages. */
+export function dbJobToJob(d: DbJob): Job {
+  return {
+    id: d.id,
+    jobNumber: d.job_number ?? '',
+    clientName: d.client_name ?? '',
+    clientId: d.client_id ?? '',
+    siteAddress: d.site_address ?? '',
+    status: d.status,
+    assignedStaff: d.assigned_staff ?? '',
+    scheduledDate: d.scheduled_date ?? '',
+    startDate: d.start_date ?? '',
+    endDate: d.end_date ?? '',
+    timeWindow: d.time_window ?? '',
+    assignedCrew: d.assigned_crew ?? '',
+    scope: d.scope ?? '',
+    materialsNeeded: [], // materials are tracked via the job_materials table
+    notes: d.notes ?? '',
+    quoteId: d.quote_id ?? undefined,
+  };
+}
 
 export const JOB_STAGES = [
   'Scheduled',
@@ -36,13 +60,6 @@ export const JOB_STAGE_BADGE: Record<string, string> = {
   'On Hold':            'bg-amber-100 text-amber-800',
   'Draft':              'bg-slate-100 text-slate-700',
 };
-
-export function updateJobStage(id: string, newStage: string) {
-  const job = jobs.find((j) => j.id === id);
-  if (job) {
-    job.status = newStage;
-  }
-}
 
 export const jobs: Job[] = [
   {
@@ -167,70 +184,4 @@ export const jobs: Job[] = [
 
 export function getJobById(id: string) {
   return jobs.find((job) => job.id === id);
-}
-
-export function createJobFromQuote(quote: Pick<import('./quotes').Quote, 'quoteNumber' | 'clientName' | 'clientId' | 'jobAddress' | 'lineItems' | 'notes'>): string {
-  const newId = String(jobs.length + 1);
-  const year = new Date().getFullYear();
-  const newJobNumber = `J-${year}-${String(jobs.length + 1).padStart(3, '0')}`;
-  const scope = quote.lineItems.map((item) => item.description).join(', ') + '.';
-  const newJob: Job = {
-    id: newId,
-    jobNumber: newJobNumber,
-    clientName: quote.clientName,
-    clientId: quote.clientId,
-    siteAddress: quote.jobAddress,
-    status: 'Scheduled',
-    assignedStaff: '',
-    scheduledDate: '',
-    startDate: '',
-    endDate: '',
-    timeWindow: '',
-    assignedCrew: '',
-    scope,
-    materialsNeeded: [],
-    notes: `Converted from quote ${quote.quoteNumber}. ${quote.notes}`,
-  };
-  jobs.push(newJob);
-  return newId;
-}
-
-/** Create a job from a live Supabase quote + its line items. */
-export function createJobFromSupabaseQuote(
-  quote: { id: string; created_at: string; contact_name: string | null; job_address: string | null; notes: string | null },
-  lineItems: { description: string }[]
-): string {
-  const newId = String(jobs.length + 1);
-  const year = new Date().getFullYear();
-  const newJobNumber = `J-${year}-${String(jobs.length + 1).padStart(3, '0')}`;
-
-  const scopeParts = lineItems.map((i) => i.description).filter(Boolean);
-  const scope = scopeParts.length > 0 ? scopeParts.join(', ') + '.' : '';
-
-  const quoteRef = new Date(quote.created_at).toLocaleDateString('en-AU', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  });
-  const noteParts = [`Converted from quote created ${quoteRef}.`];
-  if (quote.notes?.trim()) noteParts.push(quote.notes.trim());
-
-  const newJob: Job = {
-    id: newId,
-    jobNumber: newJobNumber,
-    clientName: quote.contact_name ?? '',
-    clientId: '',
-    siteAddress: quote.job_address ?? '',
-    status: 'Scheduled',
-    assignedStaff: '',
-    scheduledDate: '',
-    startDate: '',
-    endDate: '',
-    timeWindow: '',
-    assignedCrew: '',
-    scope,
-    materialsNeeded: [],
-    notes: noteParts.join(' '),
-    quoteId: quote.id,
-  };
-  jobs.push(newJob);
-  return newId;
 }

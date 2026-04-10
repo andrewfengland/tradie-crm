@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { jobs, type Job, JOB_STAGE_BADGE } from '../../lib/jobs';
+import { type Job, JOB_STAGE_BADGE } from '../../lib/jobs';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -132,12 +132,20 @@ export default function JobsSchedulePage() {
   const [view, setView] = useState<'day' | 'week'>('week');
   const [selectedDay, setSelectedDay] = useState<Date>(today);
   const [weekMonday, setWeekMonday] = useState<Date>(weekStart(today));
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    fetch('/api/jobs')
+      .then((r) => r.json())
+      .then((d) => { if (d.jobs) setAllJobs(d.jobs); })
+      .catch(() => {});
+  }, []);
 
   // Partition jobs by effective date
   const scheduledByDate = new Map<string, Job[]>();
   const unscheduled: Job[] = [];
 
-  for (const job of jobs) {
+  for (const job of allJobs) {
     const eff = effectiveDate(job);
     if (!eff) {
       unscheduled.push(job);

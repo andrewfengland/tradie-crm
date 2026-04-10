@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { jobs, JOB_STAGES } from '../../lib/jobs';
+import { JOB_STAGES } from '../../lib/jobs';
 
 const staffMembers = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown'];
 
@@ -60,31 +60,28 @@ export default function NewJobPage() {
   const handleSave = async () => {
     setIsSaving(true);
 
-    const maxId = Math.max(...jobs.map((job) => parseInt(job.id, 10)), 0);
-    const newJob = {
-      id: (maxId + 1).toString(),
-      jobNumber: `J-2024-${String(maxId + 1).padStart(3, '0')}`,
-      clientName: formData.clientName || 'New Client',
-      clientId: '',
-      siteAddress: formData.siteAddress,
-      status: formData.status,
-      assignedStaff: formData.assignedStaff,
-      scheduledDate: formData.scheduledDate,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      timeWindow: formData.timeWindow,
-      assignedCrew: formData.assignedCrew,
-      scope: formData.scope,
-      materialsNeeded: formData.materialsNeeded.filter((item) => item.trim() !== ''),
-      notes: formData.notes,
-    };
+    const res = await fetch('/api/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName:    formData.clientName || 'New Client',
+        siteAddress:   formData.siteAddress,
+        status:        formData.status,
+        assignedStaff: formData.assignedStaff,
+        scheduledDate: formData.scheduledDate,
+        startDate:     formData.startDate,
+        endDate:       formData.endDate,
+        timeWindow:    formData.timeWindow,
+        assignedCrew:  formData.assignedCrew,
+        scope:         formData.scope,
+        notes:         formData.notes,
+      }),
+    });
 
-    jobs.push(newJob);
-    console.log('Mock saved job:', newJob);
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
     setIsSaving(false);
-    router.push('/jobs');
+    if (res.ok) {
+      router.push('/jobs');
+    }
   };
 
   return (

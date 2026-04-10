@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { JOB_STAGES, JOB_STAGE_BADGE, updateJobStage } from '../../lib/jobs';
+import { JOB_STAGES, JOB_STAGE_BADGE } from '../../lib/jobs';
 
 export default function JobStageUpdater({
   jobId,
@@ -16,8 +16,16 @@ export default function JobStageUpdater({
   );
   const [saved, setSaved] = useState(false);
 
-  function handleUpdate() {
-    updateJobStage(jobId, selected);
+  const [saving, setSaving] = useState(false);
+
+  async function handleUpdate() {
+    setSaving(true);
+    await fetch(`/api/jobs/${jobId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: selected }),
+    });
+    setSaving(false);
     setDisplayedStage(selected);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -58,9 +66,10 @@ export default function JobStageUpdater({
 
         <button
           onClick={handleUpdate}
-          className="inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+          disabled={saving}
+          className="inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-60"
         >
-          {saved ? 'Stage updated!' : 'Update Stage'}
+          {saving ? 'Saving…' : saved ? 'Stage updated!' : 'Update Stage'}
         </button>
       </div>
     </section>

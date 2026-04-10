@@ -79,6 +79,25 @@ export const MATERIAL_BADGE: Record<MaterialStatus, string> = {
   'Delivered': 'bg-emerald-100 text-emerald-800',
 };
 
+export type DbJob = {
+  id: string;
+  created_at: string;
+  job_number: string | null;
+  client_name: string | null;
+  client_id: string | null;
+  site_address: string | null;
+  status: string;
+  assigned_staff: string | null;
+  scheduled_date: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  time_window: string | null;
+  assigned_crew: string | null;
+  scope: string | null;
+  notes: string | null;
+  quote_id: string | null;
+};
+
 // ── Client (lazy singleton via createBrowserClient) ──────────────────────────
 // createBrowserClient from @supabase/ssr stores the session in cookies, which
 // allows server-side helpers to read auth state on every request.

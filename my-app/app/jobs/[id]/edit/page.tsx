@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../../app/components/Sidebar';
 import TopNav from '../../../../app/components/TopNav';
-import { jobs, getJobById, JOB_STAGES } from '../../../lib/jobs';
+import { JOB_STAGES } from '../../../lib/jobs';
 
 const staffMembers = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown'];
 
@@ -34,25 +34,26 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
       const { id } = await params;
       setJobId(id);
 
-      const job = getJobById(id);
-      if (!job) {
+      const res = await fetch(`/api/jobs/${id}`);
+      if (!res.ok) {
         setJobNotFound(true);
         setIsLoading(false);
         return;
       }
+      const { job } = await res.json();
 
       setFormData({
-        siteAddress: job.siteAddress,
-        status: job.status,
-        assignedStaff: job.assignedStaff,
-        scheduledDate: job.scheduledDate,
-        startDate: job.startDate ?? '',
-        endDate: job.endDate ?? '',
-        timeWindow: job.timeWindow ?? '',
-        assignedCrew: job.assignedCrew ?? '',
-        scope: job.scope,
-        materialsNeeded: [...job.materialsNeeded],
-        notes: job.notes,
+        siteAddress:    job.siteAddress,
+        status:         job.status,
+        assignedStaff:  job.assignedStaff,
+        scheduledDate:  job.scheduledDate,
+        startDate:      job.startDate ?? '',
+        endDate:        job.endDate ?? '',
+        timeWindow:     job.timeWindow ?? '',
+        assignedCrew:   job.assignedCrew ?? '',
+        scope:          job.scope,
+        materialsNeeded: job.materialsNeeded ?? [],
+        notes:          job.notes,
       });
       setIsLoading(false);
     })();
@@ -92,28 +93,22 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
   const handleSave = async () => {
     setIsSaving(true);
 
-    // Find the job and update it in the mock data
-    const jobIndex = jobs.findIndex((j) => j.id === jobId);
-    if (jobIndex !== -1) {
-      jobs[jobIndex] = {
-        ...jobs[jobIndex],
-        siteAddress: formData.siteAddress,
-        status: formData.status,
+    await fetch(`/api/jobs/${jobId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        siteAddress:   formData.siteAddress,
+        status:        formData.status,
         assignedStaff: formData.assignedStaff,
         scheduledDate: formData.scheduledDate,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        timeWindow: formData.timeWindow,
-        assignedCrew: formData.assignedCrew,
-        scope: formData.scope,
-        materialsNeeded: formData.materialsNeeded,
-        notes: formData.notes,
-      };
-      console.log('Job updated (mock save):', jobs[jobIndex]);
-    }
-
-    // Simulate a brief save delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+        startDate:     formData.startDate,
+        endDate:       formData.endDate,
+        timeWindow:    formData.timeWindow,
+        assignedCrew:  formData.assignedCrew,
+        scope:         formData.scope,
+        notes:         formData.notes,
+      }),
+    });
 
     setIsSaving(false);
     router.push(`/jobs/${jobId}`);
