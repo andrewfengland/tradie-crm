@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '../../../../app/components/Sidebar';
 import TopNav from '../../../../app/components/TopNav';
-import { jobs, getJobById } from '../../../lib/jobs';
+import { jobs, getJobById, JOB_STAGES } from '../../../lib/jobs';
 
 const staffMembers = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown'];
-const statuses = ['Scheduled', 'In Progress', 'Awaiting Approval', 'Completed', 'On Hold'];
 
 export default function EditJobPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -212,7 +211,7 @@ export default function EditJobPage({ params }: { params: Promise<{ id: string }
                     onChange={handleChange}
                     className="mt-2 w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
                   >
-                    {statuses.map((status) => (
+                    {JOB_STAGES.map((status) => (
                       <option key={status} value={status}>
                         {status}
                       </option>

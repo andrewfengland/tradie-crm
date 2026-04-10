@@ -4,20 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Sidebar from '../../app/components/Sidebar';
 import TopNav from '../../app/components/TopNav';
-import { jobs } from '../lib/jobs';
-
-const badgeClasses: Record<string, string> = {
-  'In Progress': 'bg-emerald-100 text-emerald-800',
-  'Scheduled': 'bg-blue-100 text-blue-800',
-  'Completed': 'bg-slate-100 text-slate-700',
-};
+import { jobs, JOB_STAGES, JOB_STAGE_BADGE } from '../lib/jobs';
 
 export default function JobsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // Extract unique statuses
-  const statuses = Array.from(new Set(jobs.map(j => j.status))).sort();
+  // Extract unique statuses (canonical set first, then any legacy values)
+  const statuses = [
+    ...JOB_STAGES,
+    ...Array.from(new Set(jobs.map(j => j.status))).filter(s => !(JOB_STAGES as readonly string[]).includes(s)),
+  ];
 
   // Filter jobs based on search and filters
   const filteredJobs = jobs.filter(job => {
@@ -118,12 +115,27 @@ export default function JobsPage() {
                   </div>
                 </div>
 
-                {/* Result count */}
-                <div className="pt-2 border-t border-slate-200">
+                {/* Result count + stage summary */}
+                <div className="pt-2 border-t border-slate-200 space-y-3">
                   <p className="text-sm text-slate-600">
                     Showing <span className="font-semibold text-slate-900">{filteredJobs.length}</span> of{' '}
                     <span className="font-semibold text-slate-900">{jobs.length}</span> jobs
                   </p>
+                  <div className="flex flex-wrap gap-2">
+                    {JOB_STAGES.map((stage) => {
+                      const count = jobs.filter(j => j.status === stage).length;
+                      if (count === 0) return null;
+                      return (
+                        <button
+                          key={stage}
+                          onClick={() => setSelectedStatus(selectedStatus === stage ? '' : stage)}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] transition-opacity ${JOB_STAGE_BADGE[stage]} ${selectedStatus === stage ? 'ring-2 ring-offset-1 ring-slate-400' : 'opacity-80 hover:opacity-100'}`}
+                        >
+                          {stage} <span className="font-bold">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </section>
@@ -142,7 +154,7 @@ export default function JobsPage() {
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeClasses[job.status] ?? 'bg-slate-100 text-slate-700'}`}>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${JOB_STAGE_BADGE[job.status] ?? 'bg-slate-100 text-slate-700'}`}>
                           {job.status}
                         </span>
                         {(job.startDate || job.scheduledDate) && (

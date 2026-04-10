@@ -16,6 +16,33 @@ export type Job = {
   notes: string;
 };
 
+export const JOB_STAGES = [
+  'Scheduled',
+  'In Progress',
+  'Awaiting Materials',
+  'Completed',
+  'Invoiced',
+] as const;
+
+export const JOB_STAGE_BADGE: Record<string, string> = {
+  'Scheduled':          'bg-blue-100 text-blue-800',
+  'In Progress':        'bg-emerald-100 text-emerald-800',
+  'Awaiting Materials': 'bg-amber-100 text-amber-800',
+  'Completed':          'bg-slate-100 text-slate-700',
+  'Invoiced':           'bg-purple-100 text-purple-800',
+  // Legacy fallbacks — keep existing records clean
+  'Awaiting Approval':  'bg-amber-100 text-amber-800',
+  'On Hold':            'bg-amber-100 text-amber-800',
+  'Draft':              'bg-slate-100 text-slate-700',
+};
+
+export function updateJobStage(id: string, newStage: string) {
+  const job = jobs.find((j) => j.id === id);
+  if (job) {
+    job.status = newStage;
+  }
+}
+
 export const jobs: Job[] = [
   {
     id: '1',

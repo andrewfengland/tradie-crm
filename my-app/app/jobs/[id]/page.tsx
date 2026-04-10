@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { getJobById } from '../../lib/jobs';
+import { getJobById, JOB_STAGE_BADGE } from '../../lib/jobs';
 import TasksSection from '../../../app/components/TasksSection';
+import JobStageUpdater from './StageUpdater';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -57,12 +58,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   >
                     Edit Job
                   </Link>
-                  <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
-                    Mark Complete
-                  </button>
-                  <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
-                    View Related Quote
-                  </button>
                 </div>
               </div>
             </section>
@@ -86,7 +81,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Status</p>
-                      <p className="mt-2 font-medium text-slate-900">{job.status}</p>
+                      <div className="mt-2">
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${JOB_STAGE_BADGE[job.status] ?? 'bg-slate-100 text-slate-700'}`}>
+                          {job.status}
+                        </span>
+                      </div>
                     </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Assigned Staff</p>
@@ -142,15 +141,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               </div>
 
               <div className="space-y-4">
+                <JobStageUpdater jobId={id} currentStage={job.status} />
                 <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
-                    <h2 className="text-xl font-semibold text-slate-900">Status Summary</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Schedule</h2>
                   </div>
                   <div className="mt-5 space-y-3">
-                    <div className="rounded-3xl bg-slate-50 p-4">
-                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Current Status</p>
-                      <p className="mt-2 text-lg font-semibold text-slate-900">{job.status}</p>
-                    </div>
                     <div className="rounded-3xl bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Start → End</p>
                       <p className="mt-2 font-medium text-slate-900">

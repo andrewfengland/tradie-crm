@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
-import { jobs, type Job } from '../../lib/jobs';
+import { jobs, type Job, JOB_STAGE_BADGE } from '../../lib/jobs';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -56,20 +56,10 @@ function fmtWeekRange(mon: Date): string {
   return `${a} – ${b}`;
 }
 
-// ─── badge colours (matches jobs/page.tsx) ───────────────────────────────────
-
-const badgeClasses: Record<string, string> = {
-  'In Progress': 'bg-emerald-100 text-emerald-800',
-  'Scheduled':   'bg-blue-100 text-blue-800',
-  'Completed':   'bg-slate-100 text-slate-700',
-  'On Hold':     'bg-amber-100 text-amber-800',
-  'Awaiting Approval': 'bg-purple-100 text-purple-800',
-};
-
 // ─── job card ────────────────────────────────────────────────────────────────
 
 function JobCard({ job }: { job: Job }) {
-  const badge = badgeClasses[job.status] ?? 'bg-slate-100 text-slate-700';
+  const badge = JOB_STAGE_BADGE[job.status] ?? 'bg-slate-100 text-slate-700';
   return (
     <Link
       href={`/jobs/${job.id}`}
