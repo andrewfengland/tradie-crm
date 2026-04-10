@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
 import { getJobById } from '../../lib/jobs';
+import TasksSection from '../../../app/components/TasksSection';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -174,6 +175,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                 </section>
               </div>
             </div>
+
+            <TasksSection relatedType="job" relatedId={id} />
+
           </div>
         </main>
       </div>

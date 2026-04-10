@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Opportunity } from '@/app/lib/supabase';
+import TasksSection from '@/app/components/TasksSection';
 
 const stageBadge: Record<string, string> = {
   'New Lead':        'bg-slate-100 text-slate-700',
@@ -220,6 +221,9 @@ export default function OpportunityDetailPage() {
                 </div>
               )}
             </section>
+
+            <TasksSection relatedType="opportunity" relatedId={id} />
+
           </div>
         </main>
       </div>

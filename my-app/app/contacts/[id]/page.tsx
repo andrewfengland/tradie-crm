@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Customer } from '@/app/lib/supabase';
+import TasksSection from '@/app/components/TasksSection';
 
 export default function ContactDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -152,6 +153,8 @@ export default function ContactDetailPage() {
                 </div>
               )}
             </section>
+
+            <TasksSection relatedType="contact" relatedId={id} />
 
           </div>
         </main>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Quote, type QuoteLineItem } from '@/app/lib/supabase';
+import TasksSection from '@/app/components/TasksSection';
 
 const badgeClasses: Record<string, string> = {
   'Draft':    'bg-slate-100 text-slate-700',
@@ -263,6 +264,8 @@ export default function QuoteDetailPage() {
                 </button>
               </div>
             </section>
+
+            <TasksSection relatedType="quote" relatedId={id} />
 
           </div>
         </main>

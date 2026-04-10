@@ -22,6 +22,7 @@ export default function Sidebar() {
     { href: '/opportunities', label: 'Opportunities', icon: '💼' },
     { href: '/quotes', label: 'Quotes', icon: '📄' },
     { href: '/jobs', label: 'Jobs', icon: '🔨' },
+    { href: '/tasks', label: 'Tasks', icon: '✅' },
   ];
 
   const isActive = (href: string) => pathname === href;
