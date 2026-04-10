@@ -7,6 +7,7 @@ import Sidebar from '@/app/components/Sidebar';
 import TopNav from '@/app/components/TopNav';
 import { getSupabase, type Quote, type QuoteLineItem } from '@/app/lib/supabase';
 import TasksSection from '@/app/components/TasksSection';
+import NotesSection from '@/app/components/NotesSection';
 
 const badgeClasses: Record<string, string> = {
   'Draft':    'bg-slate-100 text-slate-700',
@@ -368,6 +369,7 @@ export default function QuoteDetailPage() {
             </section>
 
             <TasksSection relatedType="quote" relatedId={id} />
+            <NotesSection parentType="quote" parentId={id} />
 
           </div>
         </main>

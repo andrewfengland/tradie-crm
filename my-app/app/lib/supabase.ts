@@ -53,6 +53,14 @@ export type QuoteLineItem = {
   line_total: number;
 };
 
+export type Note = {
+  id: string;
+  created_at: string;
+  parent_type: string;
+  parent_id: string;
+  body: string;
+};
+
 // ── Client (lazy singleton via createBrowserClient) ──────────────────────────
 // createBrowserClient from @supabase/ssr stores the session in cookies, which
 // allows server-side helpers to read auth state on every request.

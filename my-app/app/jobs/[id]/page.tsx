@@ -3,6 +3,7 @@ import Sidebar from '../../../app/components/Sidebar';
 import TopNav from '../../../app/components/TopNav';
 import { getJobById, JOB_STAGE_BADGE } from '../../lib/jobs';
 import TasksSection from '../../../app/components/TasksSection';
+import NotesSection from '../../../app/components/NotesSection';
 import JobStageUpdater from './StageUpdater';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -173,6 +174,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </div>
 
             <TasksSection relatedType="job" relatedId={id} />
+            <NotesSection parentType="job" parentId={id} />
 
           </div>
         </main>
