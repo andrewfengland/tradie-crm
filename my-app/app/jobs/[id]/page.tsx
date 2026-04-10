@@ -5,6 +5,7 @@ import { getJobById, JOB_STAGE_BADGE } from '../../lib/jobs';
 import TasksSection from '../../../app/components/TasksSection';
 import NotesSection from '../../../app/components/NotesSection';
 import JobStageUpdater from './StageUpdater';
+import MaterialsSection from '../../../app/components/MaterialsSection';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -174,6 +175,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </div>
 
             <TasksSection relatedType="job" relatedId={id} />
+            <MaterialsSection jobId={id} />
             <NotesSection parentType="job" parentId={id} />
 
           </div>

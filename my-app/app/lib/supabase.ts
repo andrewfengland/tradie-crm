@@ -61,6 +61,23 @@ export type Note = {
   body: string;
 };
 
+export type JobMaterial = {
+  id: string;
+  created_at: string;
+  job_id: string;
+  description: string;
+  status: 'Needed' | 'Ordered' | 'Delivered';
+};
+
+export const MATERIAL_STATUSES = ['Needed', 'Ordered', 'Delivered'] as const;
+export type MaterialStatus = (typeof MATERIAL_STATUSES)[number];
+
+export const MATERIAL_BADGE: Record<MaterialStatus, string> = {
+  'Needed':    'bg-amber-100 text-amber-800',
+  'Ordered':   'bg-blue-100 text-blue-800',
+  'Delivered': 'bg-emerald-100 text-emerald-800',
+};
+
 // ── Client (lazy singleton via createBrowserClient) ──────────────────────────
 // createBrowserClient from @supabase/ssr stores the session in cookies, which
 // allows server-side helpers to read auth state on every request.
